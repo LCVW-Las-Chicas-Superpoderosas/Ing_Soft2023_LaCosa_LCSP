@@ -15,9 +15,11 @@
 	},
 	"dependencies": {
 		"@mui/material": "^5.14.9",
+		"@testing-library/dom": "^9.3.3",
 		"axios": "^1.5.0",
 		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"react-dom": "^18.2.0",
+		"react-test-renderer": "^18.2.0"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.22.20",
