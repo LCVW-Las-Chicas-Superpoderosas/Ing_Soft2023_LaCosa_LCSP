@@ -1,41 +1,33 @@
 const SERVER_URL = 'http://localhost:8000/game/join';
-// Should get a object like {idGame, password, idUser}
-const joinGame = ({idGame, password = null, idUser}) => {
+// Should recieve an Object {idUser}
+const getLobyStatus = ({idUser}) => {
 	const handleJSONParser = (response) => {
 		return new Promise((resolve) => {
 			response.json().then((json) => {
 				if (response.ok) {
-					return resolve({
-						status: response.status_code,
-						ok: response.ok,
-						players: json.data.players,
-						canStart: json.data.can_start,
-						detail: json.detail,
-					});
-				} else {
-					return resolve({
+					resolve({
 						status: response.status,
 						ok: response.ok,
-						canStart: json.data.can_start,
+						players: json.data.players,
+						cantStart: json.data.cantStart,
 						detail: json.detail,
 					});
 				}
+				resolve({
+					status: response.status,
+					ok: response.ok,
+					detail: json.detail,
+				});
 			});
 		});
 	};
 
-	const bodyRequest = {
-		idGame,
-		password,
-		idUser,
-	};
-
 	const config = {
-		method: 'POST',
+		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify(bodyRequest),
+		body: JSON.stringify({idUser}),
 	};
 	return new Promise((resolve, reject) => {
 		fetch(SERVER_URL, config)
@@ -51,4 +43,4 @@ const joinGame = ({idGame, password = null, idUser}) => {
 			});
 	});
 };
-export default joinGame;
+export default getLobyStatus;

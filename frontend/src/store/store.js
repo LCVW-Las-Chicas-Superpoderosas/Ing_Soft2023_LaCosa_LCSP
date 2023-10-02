@@ -8,6 +8,7 @@ const store = configureStore({
 		player: playerReducer,
 		hand: handReducer,
 	},
+	devTools: true,
 });
 
 export default store;

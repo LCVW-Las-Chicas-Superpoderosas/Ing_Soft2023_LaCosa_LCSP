@@ -4,6 +4,7 @@ import {createSlice} from '@reduxjs/toolkit';
 const initialState = {
 	name: '',
 	id: 0,
+	loged: false,
 };
 
 // Cambios de estado para player
@@ -14,11 +15,14 @@ const playerSlice = createSlice({
 		setName: (state, action) => {
 			state.name = action.payload;
 		},
-		setPlayerId: (state, action) => {
+		setId: (state, action) => {
 			state.id = action.payload;
+		},
+		setLogedIn: (state, action) => {
+			state.loged = action.payload;
 		},
 	},
 });
 
-export const {setName, setPlayerId} = playerSlice.actions;
+export const {setName, setId, setLogedIn} = playerSlice.actions;
 export default playerSlice.reducer;

@@ -2,7 +2,7 @@
 import { rest } from 'msw';
 
 export const handlers = [
-  rest.get('/hand', (req, res, ctx) => {
+  rest.get('https://localhost:8000/hand', (req, res, ctx) => {
     console.log('Request intercepted:', req);
     return res(
       ctx.status(200),
@@ -11,7 +11,8 @@ export const handlers = [
       })
     );
   }),
-  rest.put('/hand', (req, res, ctx) => {
+
+  rest.put('https://localhost:8000/hand', (req, res, ctx) => {
     console.log('Request intercepted:', req);
     return res(
       ctx.status(200),

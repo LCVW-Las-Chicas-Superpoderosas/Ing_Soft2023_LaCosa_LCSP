@@ -1,75 +1,83 @@
-// UserForm is our functional component
 import {useFormik} from 'formik';
-import {useDispatch} from 'react-redux';
-import {setPlayerId, setPlayerName} from '../../appActions';
-// import SendPlayerName from '../request/sendPlayerName';
-import SendPlayerName from '../request/sendPlayerName.mock';
-// UserForm is our functional component
+import {useDispatch, useSelector} from 'react-redux';
+import {setPlayerId, setPlayerName, setPlayerLogedIn} from '../../appActions';
+// eslint-disable-next-line no-unused-vars
+import React from 'react';
+import {Link} from 'react-router-dom';
+import sendPlayerName from '../request/sendPlayerName';
+// import SendPlayerName from '../request/sendPlayerName.mock';
 
+// UserForm is our functional component
 const UserForm = () => {
 	const dispatch = useDispatch();
+	const firstPlayer = useSelector((state) => state.player);
 	const initialValues = {username: ''};
+
 	const onSubmit = async (values) => {
+		const actualPlayer = {name: values.username, id: 0};
 		try {
-			// Assuming SendPlayerName returns a promise
-			const actualPlayer = {name: values.username, id: 0};
-			console.log(actualPlayer);
-			const updatedPlayer = await SendPlayerName({player: actualPlayer});
-
-			console.log('family friendly comment');
-			console.log('family friendly comment');
-			console.log(values.username);
-
-			console.log(updatedPlayer); // Assuming updatedPlayer has the response from the API
-
-			// Dispatch actions to update the Redux store
-			dispatch(setPlayerName(updatedPlayer.name));
+			const resp = await sendPlayerName({player: actualPlayer});
+			const updatedPlayer = {name: resp.name, id: resp.id};
 			dispatch(setPlayerId(updatedPlayer.id));
+			dispatch(setPlayerName(updatedPlayer.name));
+			dispatch(setPlayerLogedIn(true));
+			alert('Succes: ' + resp.detail);
 		} catch (error) {
-			// Handle any errors from the API call
-			console.error('Error:', error);
+			// The status code is missing in the response
+			console.error('Error: ' + error);
+			if (!error.ok) {
+				alert(error.detail);
+			}
+			formik.resetForm();
 		}
-		// Reset the form
 		formik.resetForm();
 	};
+
 	const validate = (values) => {
 		const errors = {};
 		if (!values.username) {
 			errors.username = 'this field is required';
 		}
-
 		return errors;
 	};
-
 	const formik = useFormik({
 		initialValues,
 		onSubmit,
 		validate,
 	});
-
-	console.log('Form values', formik.values);
-
 	return (
 		<div>
 			<form onSubmit={formik.handleSubmit}>
-				<div className='form/control'>
-					<label htmlFor='username'>User Name</label>
-					<input
-						type='text'
-						id='username'
-						name='username'
-						onChange={formik.handleChange}
-						onBlur={formik.handleBlur}
-						value={formik.values.username}
-					/>
-					{formik.errors.username ? (
-						<div className='error'> {formik.errors.username}</div>
-					) : null}
-				</div>
+				{!firstPlayer.loged ? (
+					<div className='form/control'>
+						<h1>Choose a nickname </h1>
+						<label htmlFor='username'>User Name</label>
+						<input
+							type='text'
+							id='username'
+							name='username'
+							onChange={formik.handleChange}
+							onBlur={formik.handleBlur}
+							value={formik.values.username}
+						/>
+						{formik.errors.username ? (
+							<div className='error'> {formik.errors.username}</div>
+						) : null}
+						<button type='submit' onClick={formik.handleSubmit}>
+							Submit
+						</button>
+					</div>
+				) : (
+					<div>
+						<Link to='Games/'>
+							<button>Unirse a partida</button>
+						</Link>
+						<Link to='/CreateGame'>
+							<button>Crear nueva partida</button>
+						</Link>
+					</div>
+				)}
 			</form>
-			<button type='submit' onClick={formik.handleSubmit}>
-				Submit
-			</button>
 		</div>
 	);
 };

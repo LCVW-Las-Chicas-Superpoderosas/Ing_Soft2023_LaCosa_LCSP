@@ -5,8 +5,8 @@ import './index.css';
 import {Provider} from 'react-redux';
 import store from './store/store.js';
 
-//const {worker} = require('./mocks/browser');
-//worker.start();
+// import {worker} from './mocks/worker.js';
+// worker.start();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 	<React.StrictMode>

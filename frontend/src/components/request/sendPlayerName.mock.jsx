@@ -1,10 +1,10 @@
 // Mocked version of sendPlayerName
 const SendPlayerName = async ({player}) => {
-	if (player.name === 'userName') {
+	if (player.name === 'user') {
 		return new Promise((resolve) =>
-			setTimeout(() => resolve({status: 200, name: 'username', id: 1}), 500),
+			setTimeout(() => resolve({status: 200, name: 'user', id: 1}), 500),
 		);
-	} else if (player.name === 'invalidName') {
+	} else if (player.name === 'invalid') {
 		return new Promise((resolve) =>
 			setTimeout(() => resolve({status: 401, name: null, id: null}), 500),
 		);

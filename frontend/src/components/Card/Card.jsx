@@ -6,7 +6,7 @@ const Card = ({onClick, token}) => {
 		<button className='card-button'>
 			<img
 				className='card-image'
-				src={`src/assets/cards/${token}.jpg`}
+				src={`http://localhost:5173/src/assets/cards/${token}.jpg`}
 				alt='card'
 				onClick={onClick}
 			/>

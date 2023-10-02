@@ -1,19 +1,30 @@
-const SERVER_URL = 'https://localhost:8000/game/start';
+const SERVER_URL = 'http://localhost:8000/game/start';
 
-const startGame = async ({idPartida, idUsuario}) => {
+// Should be called with an object with the idPartida and idUsuario
+const startGame = async ({values}) => {
 	const config = {
 		method: 'PUT',
-		header: {},
-		body: JSON.stringify({idPartida, idUsuario}),
+		header: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(values),
 	};
 	const parseJSONResponse = (response) => {
 		return new Promise((resolve) =>
 			response.json().then((json) => {
-				resolve({
-					status: response.status,
-					ok: response.ok,
-					json,
-				});
+				if (response.ok) {
+					resolve({
+						status: response.status,
+						ok: response.ok,
+						// data: ver bien que va aca
+					});
+				} else {
+					resolve({
+						status: response.status,
+						ok: response.ok,
+						detail: json.detail,
+					});
+				}
 			}),
 		);
 	};
