@@ -17,10 +17,14 @@ const handSlice = createSlice({
 			// Append the new card to the existing array of cards
 			state.cards = [...state.cards, ...action.payload];
 		},
+		removeFromHand: (state, action) => {
+			// Remove the card from the array of cards
+			state.cards = state.cards.filter((card) => card !== action.payload);
+		},
 	},
 });
 
 // Action creators are generated for each case reducer funcion
-export const {setHand, appendToHand} = handSlice.actions;
+export const {setHand, appendToHand, removeFromHand} = handSlice.actions;
 // return de reducer for game
 export default handSlice.reducer;
