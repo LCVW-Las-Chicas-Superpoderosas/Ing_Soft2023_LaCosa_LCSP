@@ -14,10 +14,17 @@ export const PlayerIcons = ({
 
 	/* returns true if target is adjacent to current player, false otherwise  */
 	const validTarget = (player) => {
-		const currentPlayerPosition = getPlayerPosition(players, currentPlayerId);
+		const alivePlayers = players.filter((player) => player.is_alive === true);
+		const currentPlayerIndex = getPlayerIndex(alivePlayers, currentPlayerId);
+		const targetPlayerIndex = getPlayerIndex(alivePlayers, player.id);
+
+		const distance = Math.abs(currentPlayerIndex - targetPlayerIndex);
 		return (
-			player.position === currentPlayerPosition + 1 ||
-			player.position === currentPlayerPosition - 1
+			distance === 1 ||
+			(currentPlayerIndex === alivePlayers.length - 1 &&
+				targetPlayerIndex === 0) ||
+			(targetPlayerIndex === alivePlayers.length - 1 &&
+				currentPlayerIndex === 0)
 		);
 	};
 
@@ -61,11 +68,11 @@ export const PlayerIcons = ({
 	return null;
 };
 
-/* search for a player with id targetId in the players array */
-function getPlayerPosition(players, targetId) {
+/* retrieve index of player with id playerId in the players array */
+function getPlayerIndex(players, playerId) {
 	for (let i = 0; i < players.length; i++) {
-		if (players[i].id === targetId) {
-			return players[i].position;
+		if (players[i].id === playerId) {
+			return i;
 		}
 	}
 	return null; // if player not found
