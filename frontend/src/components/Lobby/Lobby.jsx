@@ -13,46 +13,46 @@ const Lobby = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
+	const [alert, setAlert] = useState('');
+	const [alert1, setAlert1] = useState('');
+	const [alert2, setAlert2] = useState('');
+
 	const gameId = JSON.parse(sessionStorage.getItem('gameId')).id;
 	const userId = JSON.parse(sessionStorage.getItem('player')).id;
-	console.log('gameId: ', gameId);
-	console.log('userId: ', userId);
+
 	const gameStatus = useSelector((state) => state.lobby);
 	const [isHost, setIsHost] = useState(false);
 
 	const StartGame = async () => {
-		console.log('me clickearon uwu');
 		try {
 			const resp = await startGame({idPlayer: userId});
 			// to be able to render first card back in deck
 			dispatch(setFirstDeckCardBack(resp.firstDeckCardBack));
-			console.log('la respuesta es', resp);
 			navigate(`/Games/${gameId}/play`);
 		} catch (error) {
-			alert(error.detail);
+			setAlert2(error.detail);
 		}
 	};
 
 	const Abandonar = async () => {
 		try {
 			const resp = await deleteGameJoin({idPlayer: userId});
-			console.log('la respuesta es', resp);
+			console.log(resp);
 			navigate(`/`);
 		} catch (error) {
-			alert(error.detail);
+			setAlert1(error.detail);
 		}
 	};
 
-	console.log(gameStatus);
-
 	const buscarJugadores = async () => {
 		try {
+			// console.log('antes de getLobbyStatus');
+			// console.log('with id ', userId);
 			const fetchedresp = await getLobbyStatus(userId);
-			console.log('with id ', userId);
-			console.log('fetchedresp', fetchedresp);
+			// console.log('despues de getLobbyStatus');
+			/// /console.log(fetchedresp);
 			dispatch(setLobby(fetchedresp.players));
 			dispatch(setCanStart(fetchedresp.canStart)); // Assuming the response key is "can_start"
-			console.log('desp de dispatch', gameStatus);
 			setIsHost(fetchedresp.isHost);
 
 			if (fetchedresp.statusGame === 1) {
@@ -65,7 +65,7 @@ const Lobby = () => {
 					navigate(`/Games`);
 				}
 			} else {
-				alert(error.detail);
+				setAlert(error.detail);
 			}
 		}
 	};
@@ -93,10 +93,24 @@ const Lobby = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dispatch]);
 
-	console.log('the gamestatus', gameStatus);
 	return (
 		<div style={{position: 'relative'}}>
 			<VStack spacing={4} align='center' m='4'>
+				{alert ? (
+					<Text color='red.600' fontSize='xl'>
+						{alert}
+					</Text>
+				) : null}
+				{alert1 ? (
+					<Text color='red.600' fontSize='xl'>
+						{alert1}
+					</Text>
+				) : null}
+				{alert2 ? (
+					<Text color='red.600' fontSize='xl'>
+						{alert2}
+					</Text>
+				) : null}
 				<Text
 					bgGradient='linear(to-r,gray.200,white,gray.200)'
 					bgClip='text'
@@ -122,6 +136,7 @@ const Lobby = () => {
 					<Button onClick={StartGame}>Begin</Button>
 				) : null}
 			</VStack>
+
 			<Button
 				position='fixed'
 				bottom='2rem'
