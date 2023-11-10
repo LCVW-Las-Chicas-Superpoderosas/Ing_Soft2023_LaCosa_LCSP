@@ -12,10 +12,18 @@ import {
 	GridItem,
 	Flex,
 	Button,
+	Modal,
+	ModalOverlay,
+	ModalContent,
+	ModalHeader,
+	ModalFooter,
+	ModalBody,
+	ModalCloseButton,
+	useDisclosure,
 } from '@chakra-ui/react';
 import {useDispatch, useSelector} from 'react-redux';
 import getGameStatus from '../request/getGameStatus';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {
 	setCurrentPlayerInGame,
 	setPlayerInGame,
@@ -25,12 +33,26 @@ import {
 } from '../../appActions';
 import {endTurn} from '../request/endTurn';
 import {FinishGame} from '../../containers/FinishGame';
+import Defense from '../Defense/Defense';
+
 export const Game = () => {
 	const playerId = JSON.parse(sessionStorage.getItem('player')).id;
 	const currentPlayer = useSelector((state) => state.game.currentPlayer);
 	const idGame = JSON.parse(sessionStorage.getItem('gameId')).id;
 	const dispatch = useDispatch();
 	const gameStatus = useSelector((state) => state.game.isFinish);
+	const {isOpen, onOpen, onClose} = useDisclosure();
+	const [displayDefense, setDisplayDefense] = useState(false);
+	const playresponse = JSON.stringify(
+		useSelector((state) => state.playArea.response),
+	);
+
+	// useEffect to close the modal and reset displayDefense when isOpen becomes false
+	useEffect(() => {
+		if (!isOpen) {
+			setDisplayDefense(false);
+		}
+	}, [isOpen]);
 
 	useEffect(() => {
 		async function getDataOfGame() {
@@ -49,11 +71,22 @@ export const Game = () => {
 			}
 		}
 
+		if (displayDefense) {
+			onOpen();
+		}
+
 		const intervalId = setInterval(() => {
 			getDataOfGame();
 		}, 1000);
 		return () => clearInterval(intervalId);
-	}, [dispatch, playerId]);
+	}, [dispatch, playerId, displayDefense]);
+
+	const SetDefense = () => {
+		console.log('before set' + displayDefense);
+
+		setDisplayDefense(true);
+		console.log('after set' + displayDefense);
+	};
 
 	async function finishTurn() {
 		try {
@@ -71,6 +104,37 @@ export const Game = () => {
 	} else {
 		return (
 			<Center h='100%' w='100%'>
+				<>
+					<Button onClick={SetDefense}>Open Modal</Button>
+
+					<Modal isOpen={isOpen} onClose={onClose}>
+						<ModalOverlay
+							bg='none'
+							backdropFilter='auto'
+							backdropInvert='80%'
+							backdropBlur='2px'
+						/>
+						<ModalContent>
+							<ModalHeader>Quieres defenderte?</ModalHeader>
+
+							<ModalBody>
+								<Defense />
+							</ModalBody>
+
+							<ModalFooter>
+								<Button colorScheme='blue' mr={3}>
+									Jugar carta
+								</Button>
+								<Button colorScheme='red' variant='ghost' onClick={onClose}>
+									No utilizar defensa
+								</Button>
+							</ModalFooter>
+						</ModalContent>
+					</Modal>
+				</>
+				<Text color='red' fontSize='xl' fontWeight='bold'>
+					{playresponse}
+				</Text>
 				<Grid
 					h='90vh'
 					w='90vw'
