@@ -47,7 +47,7 @@ const Defense = () => {
 				boxSize='400px' // Adjust the size as needed
 				objectFit='contain' // You can use other values like 'contain' or 'fill' based on your preference
 			/>
-			<Button colorScheme='blue' mr={3} onClick={playCard}>
+			<Button colorScheme='blue' mr={3}>
 				Jugar carta
 			</Button>
 		</Box>

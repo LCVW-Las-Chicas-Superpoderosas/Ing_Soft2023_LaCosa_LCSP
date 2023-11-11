@@ -35,16 +35,16 @@ import {FinishGame} from '../../containers/FinishGame';
 import Defense from '../Defense/Defense';
 
 export const Game = () => {
-	const playerId = JSON.parse(sessionStorage.getItem('player')).id;
+	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
 	const currentPlayer = useSelector((state) => state.game.currentPlayer);
 	const idGame = JSON.parse(sessionStorage.getItem('gameId')).id;
 	const dispatch = useDispatch();
 	const gameStatus = useSelector((state) => state.game.isFinish);
 	const {isOpen, onOpen, onClose} = useDisclosure();
 	const [displayDefense, setDisplayDefense] = useState(false);
-	const playresponse = JSON.stringify(
+	/* const playresponse = JSON.stringify(
 		useSelector((state) => state.playArea.response),
-	);
+	); */
 
 	// useEffect to close the modal and reset displayDefense when isOpen becomes false
 	useEffect(() => {
@@ -54,32 +54,46 @@ export const Game = () => {
 	}, [isOpen]);
 
 	useEffect(() => {
-		async function getDataOfGame() {
-			try {
-				const gameStatus = await getGameStatus(playerId);
-				dispatch(setPlayerInGame(gameStatus.players));
-				dispatch(setPositionInGame(gameStatus.position));
-				dispatch(setIsFinish(gameStatus.isFinish));
-				dispatch(setCurrentPlayerInGame(gameStatus.currentPlayerId));
-			} catch (error) {
-				if (!error.ok) {
-					console.log('Error unexpected fetching data of the game');
-				} else {
-					console.log('Error in getGameStatus', error);
-				}
-			}
+		const connection = new WebSocket('ws://localhost:8000/ws/game_status'); // testearlo al ws o http.
+		console.log(connection);
+		console.log('***CREATED WEBSOCKET');
+
+		connection.onopen = () => {
+			console.log('***ONOPEN id=', idPlayer);
+			// send the playerid
+
+			const idToSend = {type: 'game_status', content: {id_player: idPlayer}};
+			console.log('sending ', JSON.stringify(idToSend));
+			console.log('on the web socket');
+			connection.send(JSON.stringify(idToSend)); // event: game_status.
+		};
+
+		function getDataOfGame(gameStatus) {
+			console.log('THE gameStatus is ');
+			console.log(gameStatus);
+			dispatch(setPlayerInGame(gameStatus.players));
+			dispatch(setPositionInGame(gameStatus.position));
+			dispatch(setIsFinish(gameStatus.isFinish));
+			dispatch(setCurrentPlayerInGame(gameStatus.currentPlayerId));
 		}
+
+		connection.onmessage = function (response) {
+			console.log('on message: ', response);
+			const resp = JSON.parse(response.data);
+			const gameStatus = getGameStatus(resp, idPlayer);
+			getDataOfGame(gameStatus);
+		};
 
 		if (displayDefense) {
 			onOpen();
 		}
 
-		const intervalId = setInterval(() => {
-			getDataOfGame();
-		}, 1000);
-		return () => clearInterval(intervalId);
+		return () => {
+			// connection.close();
+			console.log('on return');
+		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [dispatch, playerId, displayDefense]);
+	}, [idPlayer, dispatch, displayDefense]);
 
 	const SetDefense = () => {
 		console.log('before set' + displayDefense);
@@ -204,15 +218,15 @@ export const Game = () => {
 					>
 						<Button
 							variant='solid'
-							bg={playerId === currentPlayer ? 'teal' : 'gray'}
+							bg={idPlayer === currentPlayer ? 'teal' : 'gray'}
 							aria-label='Call Sage'
 							fontSize='20px'
 							onClick={() => {
-								if (playerId === currentPlayer) {
+								if (idPlayer === currentPlayer) {
 									finishTurn();
 								}
 							}}
-							disabled={playerId !== currentPlayer}
+							disabled={idPlayer !== currentPlayer}
 						>
 							Finish Turn
 						</Button>
