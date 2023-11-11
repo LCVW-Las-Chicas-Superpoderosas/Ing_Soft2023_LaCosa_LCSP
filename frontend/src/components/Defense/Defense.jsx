@@ -16,7 +16,10 @@ const response_mock = {
 
 const Defense = ({connection}) => {
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
+	//if response.type = defens
 	const response = useSelector((state) => state.playArea.response);
+	console.log('reading response from state');
+	console.log(response);
 
 	const Play = async () => {
 		if (connection) {
@@ -25,18 +28,28 @@ const Defense = ({connection}) => {
 					idPlayer,
 					type: 'defense',
 					playedCard: response.has_defense,
-					targetId: response.attacker.id,
+					targetId: response.attacker_id,
 				};
 
 				connection.send(JSON.stringify(bodyTosend));
 			}
 		}
 	};
-	const attacker_name = response.attacker.name;
-	const imgSrc = response.has_defense;
-	const expr = response.attack_type;
+	let attacker_name = ''; // Declare attacker_name outside the if block
+	let imgSrc = ''; // Declare imgSrc outside the if block
+	let expr = ''; // Declare expr outside the if block
 
-	return (
+	if (response) {
+		console.log('reading response from state in the if', response);
+		attacker_name = response.attacker.name;
+		console.log('attacker name is ', attacker_name);
+		imgSrc = response.has_defense;
+		console.log('imgSrc is ', imgSrc);
+		expr = response.attack_type;
+		console.log('expr is ', expr);
+	}
+
+	return response ? (
 		<Box textAlign='center'>
 			<Text color='whatsapp.700' fontSize='md' fontWeight='bold' mb={5}>
 				{`El jugador ${attacker_name} jugó la carta ${expr} contra ti`}
@@ -47,10 +60,15 @@ const Defense = ({connection}) => {
 				boxSize='400px' // Adjust the size as needed
 				objectFit='contain' // You can use other values like 'contain' or 'fill' based on your preference
 			/>
+
 			<Button colorScheme='blue' mr={3} onClick={Play}>
 				Jugar carta
 			</Button>
 		</Box>
+	) : (
+		<Text color='whatsapp.700' fontSize='md' fontWeight='bold' mb={5}>
+			The defense card information is not available
+		</Text>
 	);
 };
 

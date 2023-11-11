@@ -113,6 +113,7 @@ export const Game = () => {
 		};
 
 		connection.onmessage = function (response) {
+			//types defense y play_card
 			console.log('on message: ', response);
 			const resp = JSON.parse(response.data);
 			dispatch(saveResponse(resp));
@@ -152,8 +153,8 @@ export const Game = () => {
 		const bodyTosend = {
 			idPlayer,
 			type: 'defense',
-			playedCard: 'empty',
-			targetId: 'empty',
+			playedCard: null,
+			targetId: null,
 		};
 		conHandPlay.send(JSON.stringify(bodyTosend));
 
