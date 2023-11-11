@@ -18,7 +18,6 @@ import {
 	ModalHeader,
 	ModalFooter,
 	ModalBody,
-	ModalCloseButton,
 	useDisclosure,
 } from '@chakra-ui/react';
 import {useDispatch, useSelector} from 'react-redux';
@@ -79,6 +78,7 @@ export const Game = () => {
 			getDataOfGame();
 		}, 1000);
 		return () => clearInterval(intervalId);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dispatch, playerId, displayDefense]);
 
 	const SetDefense = () => {
@@ -120,11 +120,11 @@ export const Game = () => {
 							<ModalBody>
 								<Defense />
 							</ModalBody>
+							<ModalBody>
+								<PlayArea />
+							</ModalBody>
 
 							<ModalFooter>
-								<Button colorScheme='blue' mr={3}>
-									Jugar carta
-								</Button>
 								<Button colorScheme='red' variant='ghost' onClick={onClose}>
 									No utilizar defensa
 								</Button>
@@ -132,9 +132,9 @@ export const Game = () => {
 						</ModalContent>
 					</Modal>
 				</>
-				<Text color='red' fontSize='xl' fontWeight='bold'>
+				{/* <Text color='red' fontSize='xl' fontWeight='bold'>
 					{playresponse}
-				</Text>
+				</Text> */}
 				<Grid
 					h='90vh'
 					w='90vw'

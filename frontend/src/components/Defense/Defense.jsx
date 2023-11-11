@@ -1,9 +1,9 @@
-import {useEffect} from 'react';
-import React from 'react';
-import {Box, Image, Text} from '@chakra-ui/react';
+/* eslint-disable camelcase */
+// eslint-disable-next-line no-unused-vars
+import React, {useEffect} from 'react';
+import {Box, Image, Text, Button} from '@chakra-ui/react';
 
 const response_mock = {
-	under_infection: 0,
 	under_attack: 1,
 	attack_type: 'Cambio de Lugar',
 	has_defense: 'img.71',
@@ -18,7 +18,7 @@ const Defense = () => {
 		case 'Cambio de Lugar':
 			console.log('defending with Cambio de Lugar');
 
-			//play (de lo que corresponda)
+			// play (de lo que corresponda)
 			imgSrc = 'img71.jpg';
 			break;
 		case 'Mangoes':
@@ -47,6 +47,9 @@ const Defense = () => {
 				boxSize='400px' // Adjust the size as needed
 				objectFit='contain' // You can use other values like 'contain' or 'fill' based on your preference
 			/>
+			<Button colorScheme='blue' mr={3} onClick={playCard}>
+				Jugar carta
+			</Button>
 		</Box>
 	);
 };

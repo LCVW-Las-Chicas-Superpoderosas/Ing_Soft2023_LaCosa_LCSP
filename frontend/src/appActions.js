@@ -13,6 +13,7 @@ export const restoreTurnConditions = createAction('hand/restoreTurnConditions');
 // Play Area actions
 export const addToPlayArea = createAction('playArea/addToPlayArea');
 export const cleanPlayArea = createAction('playArea/cleanPlayArea');
+export const saveResponse = createAction('playArea/saveResponse');
 // Discard Pile actions
 export const addToDiscardPile = createAction('discardPile/addToDiscardPile');
 export const cleanDiscardPile = createAction('discardPile/cleanDiscardPile');
