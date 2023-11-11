@@ -4,16 +4,17 @@ import {useSelector, useDispatch} from 'react-redux';
 import {
 	removeFromHand,
 	addToDiscardPile,
-	setPlayerInGame as updatePlayers,
+	// setPlayerInGame as updatePlayers,
 	addToPlayArea,
 	cleanPlayArea,
 	setAlreadyPlayed,
 } from '../../appActions';
-import playCard from '../request/playCard';
+// import playCard from '../request/playCard';
 import {Box} from '@chakra-ui/react';
-import getGameStatus from '../request/getGameStatus';
+import PropTypes from 'prop-types';
+// import getGameStatus from '../request/getGameStatus';
 
-const PlayArea = () => {
+const PlayArea = ({connection}) => {
 	const dispatch = useDispatch();
 
 	const selectedCard = useSelector((state) => state.hand.selectedCard);
@@ -39,19 +40,13 @@ const PlayArea = () => {
 		}
 
 		const applyCardEffect = async () => {
-			try {
-				//eslint-disable-next-line no-unused-vars
-				const res = await playCard({
-					playedCard: playedCard.card,
-					idPlayer,
-					targetId: playedCard.target,
-				});
-				const gameStatus = await getGameStatus(idPlayer);
-				const cardEffect = gameStatus.players;
-				dispatch(updatePlayers(cardEffect));
-			} catch (error) {
-				console.log('Error in PlayArea', error);
-			}
+			const body = {
+				playedCard: playedCard.card,
+				idPlayer,
+				targetId: playedCard.target,
+				type: 'play_card',
+			};
+			connection.send(JSON.stringify(body));
 		};
 
 		applyCardEffect();
@@ -91,6 +86,12 @@ const PlayArea = () => {
 			{displayCard && <Card info={displayCard} front={true} />}
 		</Box>
 	);
+};
+
+PlayArea.propTypes = {
+	connection: PropTypes.shape({
+		send: PropTypes.func.isRequired,
+	}).isRequired,
 };
 
 export default PlayArea;

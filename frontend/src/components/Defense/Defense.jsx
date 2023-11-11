@@ -1,8 +1,12 @@
 /* eslint-disable camelcase */
-// eslint-disable-next-line no-unused-vars
-import React, {useEffect} from 'react';
-import {Box, Image, Text, Button} from '@chakra-ui/react';
 
+import PropTypes from 'prop-types';
+// eslint-disable-next-line no-unused-vars
+import React from 'react';
+import {Box, Image, Text, Button} from '@chakra-ui/react';
+import {useSelector} from 'react-redux';
+
+// eslint-disable-next-line no-unused-vars
 const response_mock = {
 	under_attack: 1,
 	attack_type: 'Cambio de Lugar',
@@ -10,32 +14,28 @@ const response_mock = {
 	attacker_name: 'pepe',
 };
 
-const Defense = () => {
-	const attacker_name = response_mock.attacker_name;
-	let imgSrc;
-	const expr = response_mock.attack_type;
-	switch (expr) {
-		case 'Cambio de Lugar':
-			console.log('defending with Cambio de Lugar');
+const Defense = ({connection}) => {
+	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
+	const response = useSelector((state) => state.playArea.response);
 
-			// play (de lo que corresponda)
-			imgSrc = 'img71.jpg';
-			break;
-		case 'Mangoes':
-		case 'Papayas':
-			console.log('Mangoes and papayas are $2.79 a pound.');
-			// Expected output: "Mangoes and papayas are $2.79 a pound."
-			break;
-		default:
-			console.log(`Sorry, the attack ${expr} doesnt exists.`);
-	}
+	const Play = async () => {
+		if (connection) {
+			if (response) {
+				const bodyTosend = {
+					idPlayer,
+					type: 'defense',
+					playedCard: response.has_defense,
+					targetId: response.attacker.id,
+				};
 
-	/* return (
-		<img
-			src={`http://localhost:5173/src/assets/cards/${imgSrc}`}
-			alt={`Defense for ${expr}`}
-		/>
-	); */
+				connection.send(JSON.stringify(bodyTosend));
+			}
+		}
+	};
+	const attacker_name = response.attacker.name;
+	const imgSrc = response.has_defense;
+	const expr = response.attack_type;
+
 	return (
 		<Box textAlign='center'>
 			<Text color='whatsapp.700' fontSize='md' fontWeight='bold' mb={5}>
@@ -47,11 +47,17 @@ const Defense = () => {
 				boxSize='400px' // Adjust the size as needed
 				objectFit='contain' // You can use other values like 'contain' or 'fill' based on your preference
 			/>
-			<Button colorScheme='blue' mr={3}>
+			<Button colorScheme='blue' mr={3} onClick={Play}>
 				Jugar carta
 			</Button>
 		</Box>
 	);
+};
+
+Defense.propTypes = {
+	connection: PropTypes.shape({
+		send: PropTypes.func.isRequired,
+	}).isRequired,
 };
 
 export default Defense;

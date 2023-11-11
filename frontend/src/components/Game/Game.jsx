@@ -29,6 +29,7 @@ import {
 	setPositionInGame,
 	setIsFinish,
 	restoreTurnConditions,
+	saveResponse,
 } from '../../appActions';
 import {endTurn} from '../request/endTurn';
 import {FinishGame} from '../../containers/FinishGame';
@@ -42,6 +43,7 @@ export const Game = () => {
 	const gameStatus = useSelector((state) => state.game.isFinish);
 	const {isOpen, onOpen, onClose} = useDisclosure();
 	const [displayDefense, setDisplayDefense] = useState(false);
+	const [conHandPlay, setconHandPlay] = useState(null);
 	/* const playresponse = JSON.stringify(
 		useSelector((state) => state.playArea.response),
 	); */
@@ -59,18 +61,18 @@ export const Game = () => {
 		console.log('***CREATED WEBSOCKET');
 
 		connection.onopen = () => {
-			console.log('***ONOPEN id=', idPlayer);
+			// console.log('***ONOPEN id=', idPlayer);
 			// send the playerid
 
 			const idToSend = {type: 'game_status', content: {id_player: idPlayer}};
-			console.log('sending ', JSON.stringify(idToSend));
-			console.log('on the web socket');
+			// console.log('sending ', JSON.stringify(idToSend));
+			// console.log('on the web socket');
 			connection.send(JSON.stringify(idToSend)); // event: game_status.
 		};
 
 		function getDataOfGame(gameStatus) {
-			console.log('THE gameStatus is ');
-			console.log(gameStatus);
+			// console.log('THE gameStatus is ');
+			// console.log(gameStatus);
 			dispatch(setPlayerInGame(gameStatus.players));
 			dispatch(setPositionInGame(gameStatus.position));
 			dispatch(setIsFinish(gameStatus.isFinish));
@@ -78,10 +80,43 @@ export const Game = () => {
 		}
 
 		connection.onmessage = function (response) {
-			console.log('on message: ', response);
+			// console.log('on message: ', response);
 			const resp = JSON.parse(response.data);
 			const gameStatus = getGameStatus(resp, idPlayer);
 			getDataOfGame(gameStatus);
+		};
+
+		return () => {
+			// connection.close();
+			// console.log('on return');
+		};
+	}, [idPlayer, dispatch, displayDefense]);
+
+	useEffect(() => {
+		const connection = new WebSocket('ws://localhost:8000/ws/hand_play'); // testearlo al ws o http.
+		console.log(connection);
+		console.log('***CREATED WEBSOCKET');
+		setconHandPlay(connection);
+
+		connection.onopen = () => {
+			console.log('***ONOPEN id=', idPlayer);
+			// send the playerid
+
+			// {"id_player": int , card_token: str, : int, data}
+
+			const idToSend = {
+				content: {id_player: idPlayer},
+			};
+			console.log('sending ', JSON.stringify(idToSend));
+			console.log('on the web socket');
+			connection.send(JSON.stringify(idToSend)); // event: game_status. */
+		};
+
+		connection.onmessage = function (response) {
+			console.log('on message: ', response);
+			const resp = JSON.parse(response.data);
+			dispatch(saveResponse(resp));
+			setDisplayDefense(resp.under_attack);
 		};
 
 		if (displayDefense) {
@@ -93,14 +128,14 @@ export const Game = () => {
 			console.log('on return');
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [idPlayer, dispatch, displayDefense]);
+	}, [idPlayer, dispatch, displayDefense, setconHandPlay]);
 
-	const SetDefense = () => {
+	/* 	const SetDefense = () => {
 		console.log('before set' + displayDefense);
 
 		setDisplayDefense(true);
 		console.log('after set' + displayDefense);
-	};
+	}; */
 
 	async function finishTurn() {
 		try {
@@ -113,13 +148,25 @@ export const Game = () => {
 		}
 	}
 
+	const sendEmptyPlay = () => {
+		const bodyTosend = {
+			idPlayer,
+			type: 'defense',
+			playedCard: 'empty',
+			targetId: 'empty',
+		};
+		conHandPlay.send(JSON.stringify(bodyTosend));
+
+		onClose();
+	};
+
 	if (gameStatus === 2) {
 		return <FinishGame />;
 	} else {
 		return (
 			<Center h='100%' w='100%'>
 				<>
-					<Button onClick={SetDefense}>Open Modal</Button>
+					{/* 	<Button onClick={SetDefense}>Open Modal</Button> */}
 
 					<Modal isOpen={isOpen} onClose={onClose}>
 						<ModalOverlay
@@ -132,14 +179,15 @@ export const Game = () => {
 							<ModalHeader>Quieres defenderte?</ModalHeader>
 
 							<ModalBody>
-								<Defense />
-							</ModalBody>
-							<ModalBody>
-								<PlayArea />
+								<Defense connection={conHandPlay} />
 							</ModalBody>
 
 							<ModalFooter>
-								<Button colorScheme='red' variant='ghost' onClick={onClose}>
+								<Button
+									colorScheme='red'
+									variant='ghost'
+									onClick={sendEmptyPlay}
+								>
 									No utilizar defensa
 								</Button>
 							</ModalFooter>
@@ -191,7 +239,7 @@ export const Game = () => {
 								<Text textAlign='center' color='white'>
 									PLAY
 								</Text>
-								<PlayArea />
+								<PlayArea connection={conHandPlay} />
 							</Box>
 							<Box w='200px' border='2px' color='gray.800' mt='5'>
 								<Text textAlign='center' color='white'>

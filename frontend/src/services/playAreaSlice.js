@@ -2,7 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 
 const initialState = {
 	card: null, // objeto de la forma {card, target}
-	response: 'initial state', // JSON que guarda la respuesta del back parseada
+	response: null, // JSON que guarda la respuesta del back parseada
 };
 
 const playAreaSlice = createSlice({
