@@ -113,7 +113,7 @@ export const Game = () => {
 		};
 
 		connection.onmessage = function (response) {
-			//types defense y play_card
+			// types defense y play_card
 			console.log('on message: ', response);
 			const resp = JSON.parse(response.data);
 			dispatch(saveResponse(resp));
@@ -167,7 +167,7 @@ export const Game = () => {
 		return (
 			<Center h='100%' w='100%'>
 				<>
-					{/* 	<Button onClick={SetDefense}>Open Modal</Button> */}
+					{/*		<Button onClick={SetDefense}>Open Modal</Button> */}
 
 					<Modal isOpen={isOpen} onClose={onClose}>
 						<ModalOverlay
@@ -176,13 +176,13 @@ export const Game = () => {
 							backdropInvert='80%'
 							backdropBlur='2px'
 						/>
-						<ModalContent>
+						<ModalContent maxW='xl'>
+							{' '}
+							{/* Set max width here, 'xl' for extra-large, adjust as needed */}
 							<ModalHeader>Quieres defenderte?</ModalHeader>
-
 							<ModalBody>
 								<Defense connection={conHandPlay} />
 							</ModalBody>
-
 							<ModalFooter>
 								<Button
 									colorScheme='red'
