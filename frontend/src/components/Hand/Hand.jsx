@@ -1,10 +1,11 @@
-import {VStack, HStack, Box, Text} from '@chakra-ui/react'; // Import HStack
+import {HStack, Box, Text} from '@chakra-ui/react'; // Import HStack
 import Card from '../../components/Card/Card.jsx';
 import getHand from '../request/getHand';
-import {useEffect,useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {setHand, selectCard, cleanSelectedCard} from '../../appActions';
 import isValidCard from '../../services/cardConditions.js';
+// eslint-disable-next-line no-unused-vars
 import {response} from 'msw';
 // represents a player's hand
 const Hand = () => {
@@ -21,6 +22,7 @@ const Hand = () => {
 		const fetchHand = async () => {
 			const res = await getHand(userId);
 			dispatch(setHand(res.cards));
+			console.log('fetchHand', res.cards);
 		};
 		fetchHand();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -38,24 +40,14 @@ const Hand = () => {
 		if (selectedCard !== clickedCard) {
 			setAlert('');
 			if (isValidCard(clickedCard.token)) {
-				if (1) {
-					// response.under_attack && response && response.has_defense
-					const response_sin_jpg = ['img40', 'img70'];
+				if (response.under_attack && response && response.has_defense) {
+					// const response_sin_jpg = ['img40', 'img70'];
 					// const response_mock = addJpgExtension(response_sin_jpg);
-					const response_has_defense_jpg = addJpgExtension(response_sin_jpg);
+					const responseHasDefenseJpg = addJpgExtension(response.has_defense);
 
-					console.log('response_has_defense', response_has_defense_jpg);
-					console.log('clickedCard.token', clickedCard.token);
 					// Check if clickedCard is in the response.has_defense array
-					const is_on_array = response_has_defense_jpg.includes(
-						clickedCard.token,
-					);
-					console.log('is_on_array', is_on_array);
-					if (
-						is_on_array
-						/* response_mock &&
-						response_mock.includes(clickedCard.token) */
-					) {
+					const isOnArray = responseHasDefenseJpg.includes(clickedCard.token);
+					if (isOnArray) {
 						dispatch(selectCard(clickedCard));
 					} else {
 						setAlert('You cannot play this card', clickedCard);

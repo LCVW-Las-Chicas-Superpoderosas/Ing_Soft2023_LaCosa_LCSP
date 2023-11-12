@@ -3,7 +3,7 @@
 import PropTypes from 'prop-types';
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
-import {Box, Image, Text, Button} from '@chakra-ui/react';
+import {Box, Text, Button} from '@chakra-ui/react';
 import {useSelector} from 'react-redux';
 import Hand from '../Hand/Hand';
 
@@ -18,16 +18,29 @@ const response_mock = {
 const Defense = ({connection}) => {
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
 	const response = useSelector((state) => state.playArea.response);
+	const selectedCard = useSelector((state) => state.hand.selectedCard);
+	console.log('reading selectedCard from state', selectedCard);
 	console.log('reading response from state');
 	console.log(response);
 
 	const Play = async () => {
+		function removeJpgExtension(str) {
+			// Check if the string ends with ".jpg"
+			if (str.endsWith('.jpg')) {
+				// Remove the last 4 characters (length of ".jpg")
+				return str.slice(0, -4);
+			} else {
+				// If the string doesn't end with ".jpg", return the original string
+				return str;
+			}
+		}
 		if (connection) {
+			const selected = removeJpgExtension(selectedCard.token);
 			if (response) {
 				const bodyTosend = {
 					idPlayer,
 					type: 'defense',
-					playedCard: response.has_defense,
+					playedCard: selected,
 					targetId: response.attacker.id,
 				};
 
@@ -40,7 +53,7 @@ const Defense = ({connection}) => {
 	let imgSrc = ''; // Declare imgSrc outside the if block
 	let expr = ''; // Declare expr outside the if block
 
-	if (response !== undefined) {
+	if (response !== null) {
 		console.log('reading response from state in the if', response);
 		attacker_name = response.attacker.name;
 		console.log('attacker name is ', attacker_name);
@@ -75,9 +88,9 @@ const Defense = ({connection}) => {
 };
 
 Defense.propTypes = {
-	// connection: PropTypes.shape({
-	//	send: PropTypes.func.isRequired,
-	// }).isRequired,
+	connection: PropTypes.shape({
+		send: PropTypes.func.isRequired,
+	}).isRequired,
 };
 
 export default Defense;

@@ -4,8 +4,9 @@ import {renderWithProviders} from '../../services/providerForTest/utils-for-test
 import userEvent from '@testing-library/user-event';
 import Defense from './Defense';
 import {screen, waitFor} from '@testing-library/react';
+import WS from 'jest-websocket-mock';
 
-jest.mock('../../__mocks__/WebSockets');
+// jest.mock('../../__mocks__/WebSocketsPlay');
 
 const playerState2 = {
 	player: {
@@ -14,6 +15,27 @@ const playerState2 = {
 		loged: true,
 	},
 };
+
+const expectedCards = [
+	{id: '0', token: 'img1.jpg', type: 1},
+	{id: '1', token: 'img40.jpg', type: 1},
+	{id: '2', token: 'img72.jpg', type: 1},
+	{id: '3', token: 'img78.jpg', type: 1},
+];
+
+jest.mock('../request/getHand', () => {
+	return {
+		__esModule: true,
+		default: async () => {
+			const response = {
+				status: 200,
+				ok: 'message',
+				cards: expectedCards,
+			};
+			return response;
+		},
+	};
+});
 
 describe('Defense', () => {
 	beforeEach(() => {
@@ -56,13 +78,6 @@ describe('Defense', () => {
 		});
 
 		await waitFor(() => {
-			expect(screen.getByRole('img')).toBeInTheDocument();
-			// check that the image is img.71
-			expect(screen.getByRole('img')).toHaveAttribute(
-				'src',
-				'http://localhost:5173/src/assets/cards/img.71',
-			);
-
 			expect(screen.getByRole('button')).toBeInTheDocument();
 
 			expect(
@@ -84,24 +99,48 @@ describe('Defense', () => {
 				response: {
 					under_attack: 1,
 					attack_type: 'Cambio de Lugar',
-					has_defense: 'img.71',
+					has_defense: ['img.40'],
 					attacker: {name: 'pepe', id: 1},
 				},
 			},
+			hand: {
+				cards: [],
+				selectedCard: {id: '1', token: 'img40.jpg', type: 1},
+				alreadyPlayed: false,
+				alreadyPicked: false,
+			},
 		};
+		// Create a mock WebSocket server
+		const server = new WS('ws://localhost/1234');
 
-		const connection = new WebSocket('ws://localhost:');
+		// Mock the WebSocket connection
+		const connection = new WebSocket('ws://localhost/1234');
+
+		await server.connected;
+
+		// Mock the send method of the connection
+		jest.spyOn(connection, 'send');
+
 		const user = userEvent.setup();
 		renderWithProviders(<Defense connection={connection} />, {
 			preloadedState: customInitialState,
 		});
 
+		// Wait for the component to render
 		await waitFor(() => {
-			expect(screen.getByRole('img')).toBeInTheDocument();
-			// i want to find the button with the text jugar carta
 			expect(screen.getByText(/Jugar Carta/i)).toBeInTheDocument();
 		});
 
+		// Simulate a user click on the "Jugar Carta" button
 		user.click(screen.getByText(/Jugar Carta/i));
+
+		// Wait for the send method to be called
+		await waitFor(() => {
+			expect(connection.send).toHaveBeenCalledTimes(1);
+			expect(connection.send).toHaveBeenCalledWith(
+				'{"idPlayer":2,"type":"defense","playedCard":"img40","targetId":1}',
+			);
+		});
+		WS.clean();
 	});
 });
