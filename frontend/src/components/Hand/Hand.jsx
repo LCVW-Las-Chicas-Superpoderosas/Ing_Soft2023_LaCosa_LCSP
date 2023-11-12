@@ -13,9 +13,15 @@ const Hand = () => {
 	const cards = useSelector((state) => state.hand.cards);
 	const selectedCard = useSelector((state) => state.hand.selectedCard);
 	const dispatch = useDispatch();
-	// const under_attack = props;
 	const response = useSelector((state) => state.playArea.response);
 	const [alert, setAlert] = useState('');
+
+	console.log('reading response from state in hand', response);
+
+	if (response) {
+		console.log('reading response from state in hand', response);
+	}
+	const underAttack = response?.under_attack;
 
 	// when component mounts
 	useEffect(() => {
@@ -37,13 +43,16 @@ const Hand = () => {
 		function addJpgExtension(array) {
 			return array.map((item) => `${item}.jpg`);
 		}
+
 		if (selectedCard !== clickedCard) {
 			setAlert('');
 			if (isValidCard(clickedCard.token)) {
-				if (response.under_attack && response && response.has_defense) {
+				if (response && response.defense_cards && underAttack) {
+					// si te estan atacando
 					// const response_sin_jpg = ['img40', 'img70'];
 					// const response_mock = addJpgExtension(response_sin_jpg);
-					const responseHasDefenseJpg = addJpgExtension(response.has_defense);
+
+					const responseHasDefenseJpg = addJpgExtension(response.defense_cards);
 
 					// Check if clickedCard is in the response.has_defense array
 					const isOnArray = responseHasDefenseJpg.includes(clickedCard.token);
@@ -53,9 +62,9 @@ const Hand = () => {
 						setAlert('You cannot play this card', clickedCard);
 						dispatch(cleanSelectedCard());
 					}
+				} else {
+					dispatch(selectCard(clickedCard));
 				}
-			} else {
-				dispatch(selectCard(clickedCard));
 			}
 		} else {
 			dispatch(cleanSelectedCard());

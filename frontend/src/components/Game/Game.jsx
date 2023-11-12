@@ -57,8 +57,6 @@ export const Game = () => {
 
 	useEffect(() => {
 		const connection = new WebSocket('ws://localhost:8000/ws/game_status'); // testearlo al ws o http.
-		console.log(connection);
-		console.log('***CREATED WEBSOCKET');
 
 		connection.onopen = () => {
 			// console.log('***ONOPEN id=', idPlayer);
@@ -93,12 +91,14 @@ export const Game = () => {
 	}, [idPlayer, dispatch, displayDefense]);
 
 	useEffect(() => {
-		const connection = new WebSocket('ws://localhost:8000/ws/hand_play'); // testearlo al ws o http.
+		const connection = new WebSocket(
+			`ws://localhost:8000/ws/hand_play?id_player=${idPlayer}`,
+		); // testearlo al ws o http.
 		console.log(connection);
 		console.log('***CREATED WEBSOCKET');
 		setconHandPlay(connection);
 
-		connection.onopen = () => {
+		/* 	connection.onopen = () => {
 			console.log('***ONOPEN id=', idPlayer);
 			// send the playerid
 
@@ -109,15 +109,34 @@ export const Game = () => {
 			};
 			console.log('sending ', JSON.stringify(idToSend));
 			console.log('on the web socket');
-			connection.send(JSON.stringify(idToSend)); // event: game_status. */
-		};
+			connection.send(JSON.stringify(idToSend)); // event: game_status. 
+		}; */
 
 		connection.onmessage = function (response) {
 			// types defense y play_card
-			console.log('on message: ', response);
+			console.log('on message de play: ', response);
 			const resp = JSON.parse(response.data);
-			dispatch(saveResponse(resp));
-			setDisplayDefense(resp.under_attack);
+
+			if (resp.type === 'play_card') {
+				if (resp.status_code === 400) {
+					alert(resp.detail);
+				} else {
+					console.log('status code ', resp.status_code, resp.detail);
+					// ver la mano del jugador como manejarla
+				}
+			} else if (resp.type === 'defense') {
+				if (resp.status_code === 400) {
+					alert(resp.detail);
+				} else {
+					dispatch(saveResponse(resp.data));
+					setDisplayDefense(resp.under_attack);
+				}
+			} else if (resp.type === 'exchange') {
+				// should add the exchange logic
+			} else {
+				console.log('the type is not valid', resp.type);
+				alert('the type is not valid', resp.type);
+			}
 		};
 
 		if (displayDefense) {

@@ -24,24 +24,15 @@ const Defense = ({connection}) => {
 	console.log(response);
 
 	const Play = async () => {
-		function removeJpgExtension(str) {
-			// Check if the string ends with ".jpg"
-			if (str.endsWith('.jpg')) {
-				// Remove the last 4 characters (length of ".jpg")
-				return str.slice(0, -4);
-			} else {
-				// If the string doesn't end with ".jpg", return the original string
-				return str;
-			}
-		}
 		if (connection) {
-			const selected = removeJpgExtension(selectedCard.token);
 			if (response) {
 				const bodyTosend = {
-					idPlayer,
-					type: 'defense',
-					playedCard: selected,
-					targetId: response.attacker.id,
+					content: {
+						id_player: idPlayer,
+						type: 'defense',
+						card_token: selectedCard.token,
+						target_id: response.attacker_id,
+					},
 				};
 
 				console.log('sending ', JSON.stringify(bodyTosend));
@@ -50,16 +41,15 @@ const Defense = ({connection}) => {
 		}
 	};
 	let attacker_name = ''; // Declare attacker_name outside the if block
-	let imgSrc = ''; // Declare imgSrc outside the if block
+	const imgSrc = ''; // Declare imgSrc outside the if block
 	let expr = ''; // Declare expr outside the if block
 
 	if (response !== null) {
 		console.log('reading response from state in the if', response);
-		attacker_name = response.attacker.name;
+		attacker_name = response.attacker_name;
 		console.log('attacker name is ', attacker_name);
-		imgSrc = response.has_defense;
 		console.log('imgSrc is ', imgSrc);
-		expr = response.attack_type;
+		expr = response.card_being_played;
 		console.log('expr is ', expr);
 	}
 
@@ -68,14 +58,8 @@ const Defense = ({connection}) => {
 			<Text color='whatsapp.700' fontSize='md' fontWeight='bold' mb={5}>
 				{`El jugador ${attacker_name} jugó la carta ${expr} contra ti`}
 			</Text>
-			{/* 	<Image
-				src={`http://localhost:5173/src/assets/cards/${imgSrc}`}
-				alt={`Defense for ${expr}`}
-				boxSize='400px' // Adjust the size as needed
-				objectFit='contain' // You can use other values like 'contain' or 'fill' based on your preference
-			/> */}
 
-			<Hand under_attack={response.under_attack} />
+			<Hand />
 			<Button colorScheme='blue' mr={3} onClick={Play}>
 				Jugar carta
 			</Button>

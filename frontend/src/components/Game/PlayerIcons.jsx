@@ -13,6 +13,7 @@ export const PlayerIcons = ({
 	const dispatch = useDispatch();
 
 	/* returns true if target is adjacent to current player, false otherwise  */
+	// eslint-disable-next-line no-unused-vars
 	const validTarget = (player) => {
 		const currentPlayerPosition = getPlayerPosition(players, currentPlayerId);
 		return (
@@ -25,20 +26,24 @@ export const PlayerIcons = ({
 		/* if a player is clicked with a card selected the card is sent to the
 		play area with the player clicked as the target */
 		const handleClick = (player) => {
-			if (selectedCard && validTarget(player)) {
+			console.log('player clicked', player);
+			console.log('selected card is', selectedCard);
+			if (selectedCard) {
+				// add bounderie for valid target
+				console.log('selecting ', player.id, 'as target');
 				dispatch(addToPlayArea({card: selectedCard, target: player.id}));
 			}
 		};
 
 		return (
 			<button
+				key={player.id}
 				onClick={() => {
 					handleClick(player);
 				}}
 			>
 				<Avatar
 					size='lg'
-					key={player.id}
 					color='white'
 					bg={avatarColor(currentPlayerId, player)}
 					border={myPlayerId === player.id ? '2px solid blue' : '0px'}
