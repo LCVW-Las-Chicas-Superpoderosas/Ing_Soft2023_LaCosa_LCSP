@@ -98,6 +98,11 @@ describe('DiscardPile component', () => {
 			preloadedState: initialState,
 		});
 
+		store.dispatch = jest.fn();
+		const discardPile = screen.getByTestId('discard-pile');
+
+		fireEvent.click(discardPile);
+
 		const state = store.getState();
 		expect(state.discardPile.discardedCard).toStrictEqual('');
 	});
@@ -121,6 +126,11 @@ describe('DiscardPile component', () => {
 			preloadedState: initialState,
 		});
 
+		store.dispatch = jest.fn();
+		const discardPile = screen.getByTestId('discard-pile');
+
+		fireEvent.click(discardPile);
+
 		const state = store.getState();
 		expect(state.discardPile.discardedCard).toStrictEqual('');
 	});
@@ -143,6 +153,11 @@ describe('DiscardPile component', () => {
 		const {store, _rtl} = renderWithProviders(<DiscardPile />, {
 			preloadedState: initialState,
 		});
+
+		store.dispatch = jest.fn();
+		const discardPile = screen.getByTestId('discard-pile');
+
+		fireEvent.click(discardPile);
 
 		const state = store.getState();
 		expect(state.discardPile.discardedCard).toStrictEqual('');
