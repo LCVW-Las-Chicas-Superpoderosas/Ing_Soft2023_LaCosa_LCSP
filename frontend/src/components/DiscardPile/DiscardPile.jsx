@@ -13,6 +13,7 @@ const DiscardPile = () => {
 	const selectedCard = useSelector((state) => state.hand.selectedCard);
 	const discardedCard = useSelector((state) => state.discardPile.discardedCard);
 	const alreadyPlayed = useSelector((state) => state.hand.alreadyPlayed);
+	const alreadyPicked = useSelector((state) => state.hand.alreadyPicked);
 	const playerInTurn = useSelector((state) => state.game.currentPlayer);
 
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
@@ -30,13 +31,21 @@ const DiscardPile = () => {
 		}, 1000);
 	}, [discardedCard]);
 
+	const canDiscard = () => {
+		return (
+			selectedCard &&
+			alreadyPicked &&
+			!alreadyPlayed &&
+			idPlayer === playerInTurn
+		);
+	};
+
 	/*
 		When the discard pile is clicked, the selected card is placed in the
 		discard pile and removed from the player's hand.
 	*/
 	const handleClick = async () => {
-		if (!selectedCard || alreadyPlayed || idPlayer !== playerInTurn) {
-			console.log('Error: invalid play');
+		if (!canDiscard()) {
 			return;
 		}
 
