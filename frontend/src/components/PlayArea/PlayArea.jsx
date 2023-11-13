@@ -12,6 +12,7 @@ import {
 import playCard from '../request/playCard';
 import {Box} from '@chakra-ui/react';
 import getGameStatus from '../request/getGameStatus';
+import {requiresTarget} from '../../services/cardConditions';
 
 const PlayArea = () => {
 	const dispatch = useDispatch();
@@ -19,10 +20,21 @@ const PlayArea = () => {
 	const selectedCard = useSelector((state) => state.hand.selectedCard);
 	const playedCard = useSelector((state) => state.playArea.card);
 	const alreadyPlayed = useSelector((state) => state.hand.alreadyPlayed);
+	const alreadyPicked = useSelector((state) => state.hand.alreadyPicked);
 	const [displayCard, setDisplayCard] = useState('');
 
 	const playerInTurn = useSelector((state) => state.game.currentPlayer);
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
+
+	const canPlayOnPlayArea = () => {
+		return (
+			selectedCard &&
+			!alreadyPlayed &&
+			alreadyPicked &&
+			idPlayer === playerInTurn &&
+			!requiresTarget(selectedCard.token)
+		);
+	};
 
 	/*
 		When clicking on the play area, the selected card is played (if there is one)
@@ -33,8 +45,7 @@ const PlayArea = () => {
 	useEffect(() => {
 		// prevent applyCardEffect from running when playedCard changes state
 		// but it's not a valid card -> caused by react strict mode
-		if (!playedCard || alreadyPlayed || idPlayer !== playerInTurn) {
-			console.log('Error: invalid play');
+		if (!playedCard) {
 			return;
 		}
 
@@ -74,7 +85,7 @@ const PlayArea = () => {
 		Cards played on the play area have no target, so target is set to -1.
 	*/
 	const handleClick = async () => {
-		if (selectedCard) {
+		if (canPlayOnPlayArea()) {
 			dispatch(addToPlayArea({card: selectedCard, target: -1}));
 		}
 	};
