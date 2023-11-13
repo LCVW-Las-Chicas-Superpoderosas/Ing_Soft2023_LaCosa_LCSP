@@ -218,6 +218,35 @@ describe('PlayArea component', () => {
 			expect(state.playArea.card).toBeNull();
 		});
 	});
+
+	it("shouldn't play a card on the play area if card requires target", async () => {
+		const initialState = {
+			...mockStore,
+			hand: {
+				...mockStore.hand,
+				selectedCard: {id: '2', token: 'img22.jpg', type: 1},
+				alreadyPlayed: true,
+			},
+		};
+
+		// eslint-disable-next-line no-unused-vars
+		const {store, _rtl} = renderWithProviders(<PlayArea />, {
+			preloadedState: initialState,
+		});
+
+		const playArea = screen.getByTestId('play-area');
+		fireEvent.click(playArea);
+
+		await waitFor(async () => {
+			const playArea = screen.getByTestId('play-area');
+			fireEvent.click(playArea);
+		});
+
+		await waitFor(async () => {
+			const state = store.getState();
+			expect(state.playArea.card).toBeNull();
+		});
+	});
 });
 
 // returns undefined because the response to this http request is not used
