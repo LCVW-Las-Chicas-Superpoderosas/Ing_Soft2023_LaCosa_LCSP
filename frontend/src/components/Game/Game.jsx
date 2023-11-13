@@ -34,7 +34,11 @@ export const Game = () => {
 	const idGame = JSON.parse(sessionStorage.getItem('gameId')).id;
 	const dispatch = useDispatch();
 	const gameStatus = useSelector((state) => state.game.isFinish);
-	const {isOpen, onOpen, onClose} = useDisclosure();
+	const {
+		isOpen: isOpenExchange,
+		onOpen: onOpenExchange,
+		onClose: onCloseExchange,
+	} = useDisclosure();
 	const [etapa, setEtapa] = useState(0);
 
 	useEffect(() => {
@@ -55,7 +59,6 @@ export const Game = () => {
 
 		connection.onmessage = function (response) {
 			const resp = JSON.parse(response.data);
-			// console.log('mensaje de back getGameStatus: ', resp);
 			const gameStatus = getGameStatus(resp, idPlayer);
 			getDataOfGame(gameStatus);
 		};
@@ -78,9 +81,9 @@ export const Game = () => {
 		return (
 			<Center h='100%' w='100%'>
 				<EndTurnExchange
-					onOpen={onOpen}
-					isOpen={isOpen}
-					onClose={onClose}
+					onOpen={onOpenExchange}
+					isOpen={isOpenExchange}
+					onClose={onCloseExchange}
 					etapa={etapa}
 					setEtapa={setEtapa}
 				/>
@@ -173,7 +176,7 @@ export const Game = () => {
 								fontSize='20px'
 								onClick={() => {
 									setEtapa(1);
-									onOpen();
+									onOpenExchange();
 								}}
 								disabled={idPlayer !== currentPlayer}
 							>

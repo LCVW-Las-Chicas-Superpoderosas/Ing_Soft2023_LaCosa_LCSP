@@ -46,7 +46,7 @@ const EndTurnExchange = ({onOpen, isOpen, onClose, etapa, setEtapa}) => {
 					console.log('Recieved a exchange_offert: ', message.data);
 					const attacker = {
 						id: message.data.attacker_id,
-						attackername: message.data.attacker_name,
+						attackerName: message.data.attacker_name,
 					};
 					console.log('ATACKEEEEER', attacker.id);
 					console.log('Response:', message.data);
@@ -108,15 +108,14 @@ const EndTurnExchange = ({onOpen, isOpen, onClose, etapa, setEtapa}) => {
 		}
 	};
 	function whatToRender(etapa) {
-		if (
-			etapa === pickFirstCard ||
-			etapa === pickSecondCard ||
-			etapa === showNewHand
-		) {
+		if (etapa === pickFirstCard || etapa === showNewHand) {
 			onOpen();
 			return <Hand />;
 		} else if (etapa === pickDefense) {
 			// check what to return
+		} else if (etapa === pickSecondCard) {
+			onOpen();
+			return <Hand isExchange={true} />;
 		} else {
 			return <div>Hand not found</div>;
 		}
@@ -125,7 +124,7 @@ const EndTurnExchange = ({onOpen, isOpen, onClose, etapa, setEtapa}) => {
 		if (etapa === pickFirstCard) {
 			return 'Pick a card to exchange';
 		} else if (etapa === pickSecondCard) {
-			return `Player ${attackerPlayer.id} want to exchange: Pick a card`;
+			return `Player ${attackerPlayer.attackerName} want to exchange: Pick a card`;
 		} else if (etapa === pickDefense) {
 			return 'Pick a card to defend';
 		} else if (etapa === showNewHand) {
