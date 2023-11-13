@@ -46,7 +46,6 @@ export const Game = () => {
 		};
 
 		function getDataOfGame(gameStatus) {
-			// console.log('The gameStatus is ', gameStatus);
 			dispatch(setPlayerInGame(gameStatus.players));
 			dispatch(setPositionInGame(gameStatus.position));
 			dispatch(setIsFinish(gameStatus.isFinish));
@@ -59,11 +58,6 @@ export const Game = () => {
 			// console.log('mensaje de back getGameStatus: ', resp);
 			const gameStatus = getGameStatus(resp, idPlayer);
 			getDataOfGame(gameStatus);
-		};
-
-		return () => {
-			// connection.close();
-			console.log('on return');
 		};
 	}, [idPlayer, dispatch]);
 

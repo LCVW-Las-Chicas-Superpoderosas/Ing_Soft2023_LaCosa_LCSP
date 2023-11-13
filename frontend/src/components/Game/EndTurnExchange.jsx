@@ -26,14 +26,12 @@ const EndTurnExchange = ({onOpen, isOpen, onClose, etapa, setEtapa}) => {
 	const [socket, setSocket] = useState(null);
 	const nextPlayerId = useSelector((state) => state.game.nextPlayerId);
 	const dispatch = useDispatch();
-	// const [etapa, setEtapa] = useState(0);
-	const [attackerPlayer, setAttackerPlayer] = useState('');
+	const [attackerPlayer, setAttackerPlayer] = useState(null);
 
 	useEffect(() => {
 		const connection = new WebSocket(
 			`ws://localhost:8000/ws/card_exchange?id_player=${idPlayer}`,
 		);
-		console.log('etapa', etapa);
 		setSocket(connection);
 		connection.onopen = () => {
 			const idToSend = {type: 'connect', id_player: idPlayer};
@@ -45,19 +43,18 @@ const EndTurnExchange = ({onOpen, isOpen, onClose, etapa, setEtapa}) => {
 				const message = JSON.parse(event.data);
 				console.log('In message, recieved a messasge:', message);
 				if (message.data.type === 'exchange_offert') {
-					// elegir carta devuelve a tipo exchange_offer el id del q me cambio la carta excanger_id
 					console.log('Recieved a exchange_offert: ', message.data);
 					const attacker = {
 						id: message.data.attacker_id,
-						name: message.data.attacker_name,
+						attackername: message.data.attacker_name,
 					};
+					console.log('ATACKEEEEER', attacker.id);
+					console.log('Response:', message.data);
 					setAttackerPlayer(attacker);
 					setEtapa(pickSecondCard);
-					console.log('new etapa', etapa);
-					console.log('attacker', attackerPlayer);
 				}
 				// exchange_result
-				if (message.data.type === 'result') {
+				else if (message.data.type === 'result') {
 					console.log('Recieved a get_result: ', message.data);
 					const newHand = message.data.hand.map((card) => ({
 						id: uuidv4(),
@@ -68,9 +65,11 @@ const EndTurnExchange = ({onOpen, isOpen, onClose, etapa, setEtapa}) => {
 					setEtapa(showNewHand);
 				}
 				// defensa
-				if (message.type === 'defense') {
+				else if (message.type === 'defense') {
 					console.log('Recieved a defense: ', message.data);
 					setEtapa(pickDefense);
+				} else {
+					console.log('Recieved a message without type: ', message.data);
 				}
 			};
 			connection.onerror = (error) => {
@@ -92,6 +91,7 @@ const EndTurnExchange = ({onOpen, isOpen, onClose, etapa, setEtapa}) => {
 						target_id: nextPlayerId,
 					},
 				};
+				console.log('PROXIMO PLAYER: ', nextPlayerId);
 				socket.send(JSON.stringify(exchangeMessage));
 				console.log('Send it :' + JSON.stringify(exchangeMessage));
 			} else if (etapa === pickSecondCard) {
@@ -99,9 +99,10 @@ const EndTurnExchange = ({onOpen, isOpen, onClose, etapa, setEtapa}) => {
 					content: {
 						type: 'exchange_offert',
 						card_token: selectedCard.token,
-						target_id: nextPlayerId, // revisar
+						target_id: attackerPlayer.id,
 					},
 				};
+				console.log(JSON.stringify(exchangeMessage));
 				socket.send(JSON.stringify(exchangeMessage));
 			}
 		}
@@ -124,7 +125,7 @@ const EndTurnExchange = ({onOpen, isOpen, onClose, etapa, setEtapa}) => {
 		if (etapa === pickFirstCard) {
 			return 'Pick a card to exchange';
 		} else if (etapa === pickSecondCard) {
-			return `Player ${attackerPlayer.name} want to exchange: Pick a card`;
+			return `Player ${attackerPlayer.id} want to exchange: Pick a card`;
 		} else if (etapa === pickDefense) {
 			return 'Pick a card to defend';
 		} else if (etapa === showNewHand) {
