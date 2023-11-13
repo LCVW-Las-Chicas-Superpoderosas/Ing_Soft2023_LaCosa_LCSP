@@ -5,6 +5,7 @@ import React, {useState, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {appendToHand} from '../../services/handSlice';
 import {addToPlayArea, setAlreadyPicked} from '../../appActions.js';
+import getDeckTopCard from '../request/getDeckTopCard.jsx';
 
 const TYPE_PANIC = 0;
 
@@ -12,9 +13,7 @@ const Deck = () => {
 	const alreadyPicked = useSelector((state) => state.hand.alreadyPicked);
 	const playerInTurn = useSelector((state) => state.game.currentPlayer);
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
-	const firstDeckCardBack = useSelector(
-		(state) => state.game.firstDeckCardBack,
-	);
+	const idGame = JSON.parse(sessionStorage.getItem('gameId')).id;
 
 	const [card, setCard] = useState(null);
 	const [displayFront, setDisplayFront] = useState(false);
@@ -22,11 +21,14 @@ const Deck = () => {
 
 	// when deck mounts
 	useEffect(() => {
-		setCard({token: '', type: firstDeckCardBack});
+		const fetchTopCard = async () => {
+			const res = await getDeckTopCard({idGame});
+			setCard({token: '', type: res.topCard});
+		};
+		fetchTopCard();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	// when deck is clicked
 	const handleClick = async () => {
 		// if it wasn't clicked already
 		if (!alreadyPicked && idPlayer === playerInTurn) {
