@@ -27,8 +27,11 @@ import {endTurn} from '../request/endTurn';
 import {FinishGame} from '../../containers/FinishGame';
 export const Game = () => {
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
-	const currentPlayer = useSelector((state) => state.game.currentPlayer);
 	const idGame = JSON.parse(sessionStorage.getItem('gameId')).id;
+
+	const currentPlayer = useSelector((state) => state.game.currentPlayer);
+	const alreadyPlayed = useSelector((state) => state.hand.alreadyPlayed);
+
 	const dispatch = useDispatch();
 	const gameStatus = useSelector((state) => state.game.isFinish);
 	const [socketChat, setSocketChat] = useState(null);
@@ -162,7 +165,7 @@ export const Game = () => {
 							aria-label='Call Sage'
 							fontSize='20px'
 							onClick={() => {
-								if (idPlayer === currentPlayer) {
+								if (idPlayer === currentPlayer && alreadyPlayed) {
 									finishTurn();
 								}
 							}}
