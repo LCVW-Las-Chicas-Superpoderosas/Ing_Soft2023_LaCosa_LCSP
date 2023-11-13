@@ -19,9 +19,9 @@ export const PlayerIcons = ({
 			const adjacentPlayers = getAdjacentPlayers(alivePlayers, currentPlayerId);
 
 			return (
-				targetPlayer.id === adjacentPlayers[0].id||
+				targetPlayer.id === adjacentPlayers[0].id ||
 				targetPlayer.id === adjacentPlayers[1].id
-			)
+			);
 		};
 
 		/* if a player is clicked with a card selected the card is sent to the
