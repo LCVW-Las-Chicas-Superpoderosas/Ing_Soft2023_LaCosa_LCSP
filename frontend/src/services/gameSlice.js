@@ -5,7 +5,6 @@ const initialState = {
 	position: 0,
 	isFinish: 1,
 	currentPlayer: 0,
-	firstDeckCardBack: -1,
 };
 
 const gameSlice = createSlice({
@@ -24,17 +23,9 @@ const gameSlice = createSlice({
 		setCurrentPlayer: (state, action) => {
 			state.currentPlayer = action.payload;
 		},
-		setFirstDeckCardBack: (state, action) => {
-			state.firstDeckCardBack = action.payload;
-		},
 	},
 });
 
-export const {
-	setPlayers,
-	setPosition,
-	setIsFinish,
-	setCurrentPlayer,
-	setFirstDeckCardBack,
-} = gameSlice.actions;
+export const {setPlayers, setPosition, setIsFinish, setCurrentPlayer} =
+	gameSlice.actions;
 export default gameSlice.reducer;
