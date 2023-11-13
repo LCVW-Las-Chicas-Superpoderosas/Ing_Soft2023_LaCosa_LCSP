@@ -12,16 +12,18 @@ export const PlayerIcons = ({
 	const selectedCard = useSelector((state) => state.hand.selectedCard);
 	const dispatch = useDispatch();
 
-	/* returns true if target is adjacent to current player, false otherwise  */
-	const validTarget = (player) => {
-		const currentPlayerPosition = getPlayerPosition(players, currentPlayerId);
-		return (
-			player.position === currentPlayerPosition + 1 ||
-			player.position === currentPlayerPosition - 1
-		);
-	};
-
 	const renderPlayer = (player) => {
+		/* returns true if target is adjacent to current player, false otherwise  */
+		const validTarget = (targetPlayer) => {
+			const alivePlayers = players.filter((player) => player.is_alive);
+			const adjacentPlayers = getAdjacentPlayers(alivePlayers, currentPlayerId);
+
+			return (
+				targetPlayer.id === adjacentPlayers[0].id ||
+				targetPlayer.id === adjacentPlayers[1].id
+			);
+		};
+
 		/* if a player is clicked with a card selected the card is sent to the
 		play area with the player clicked as the target */
 		const handleClick = (player) => {
@@ -62,15 +64,17 @@ export const PlayerIcons = ({
 	return null;
 };
 
-/* search for a player with id targetId in the players array */
-function getPlayerPosition(players, targetId) {
-	for (let i = 0; i < players.length; i++) {
-		if (players[i].id === targetId) {
-			return players[i].position;
-		}
-	}
-	return null; // if player not found
-}
+const getAdjacentPlayers = (alivePlayers, currentPlayerId) => {
+	const length = alivePlayers.length;
+	const currentPlayerIndex = alivePlayers.findIndex(
+		(player) => player.id === currentPlayerId,
+	);
+
+	const adjacentLeft = alivePlayers[(currentPlayerIndex - 1 + length) % length];
+	const adjacentRight = alivePlayers[(currentPlayerIndex + 1) % length];
+
+	return [adjacentLeft, adjacentRight];
+};
 
 const avatarColor = (currentPlayerId, player) => {
 	let bgColor = 'gray.900';
