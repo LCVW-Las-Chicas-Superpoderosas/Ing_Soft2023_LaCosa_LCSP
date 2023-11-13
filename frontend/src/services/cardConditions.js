@@ -9,7 +9,32 @@ export default isValidCard;
 /* returns true if card requires a target to be selected in order to be played */
 export const requiresTarget = (cardToken) => {
 	const cardName = getCardName(cardToken);
-	return cardName === 'lanzallamas' || cardName === 'cambio de lugar';
+	return (
+		cardName === 'lanzallamas' ||
+		cardName === 'analisis' ||
+		cardName === 'hacha' ||
+		cardName === 'sospecha' ||
+		cardName === 'cambio de lugar' ||
+		cardName === 'mas vale que corras' ||
+		cardName === 'seduccion' ||
+		cardName === 'cuarentena'
+	);
+};
+
+export const isDefense = (cardToken) => {
+	const cardName = getCardName(cardToken);
+	return (
+		cardName === 'aterrador' ||
+		cardName === 'aqui estoy bien' ||
+		cardName === 'no, gracias' ||
+		cardName === 'fallaste' ||
+		cardName === 'nada de barbacoas'
+	);
+};
+
+export const isObstacle = (cardToken) => {
+	const cardName = getCardName(cardToken);
+	return cardName === 'puerta atrancada';
 };
 
 /* Get a card's name from a token
