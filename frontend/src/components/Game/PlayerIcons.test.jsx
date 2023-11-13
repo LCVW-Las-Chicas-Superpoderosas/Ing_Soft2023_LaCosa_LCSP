@@ -101,7 +101,7 @@ describe('Player Icons tests', () => {
 		});
 	});
 
-	it('should let the player select a valid target', async () => {
+	it("player's at the edges of the array should be considered adjacent", async () => {
 		window.sessionStorage.setItem('player', JSON.stringify(player));
 		window.sessionStorage.setItem('gameId', 1);
 
@@ -133,6 +133,42 @@ describe('Player Icons tests', () => {
 					type: 1,
 				},
 				target: 3,
+			});
+		});
+	});
+
+	it('should let the player select an adjacent target', async () => {
+		window.sessionStorage.setItem('player', JSON.stringify(player));
+		window.sessionStorage.setItem('gameId', 1);
+
+		// eslint-disable-next-line no-unused-vars
+		const {store, _rtl} = renderWithProviders(
+			<ChakraProvider>
+				<PlayerIcons
+					relativePositionToTable={realativePositionToTable1}
+					players={players1}
+					currentPlayerId={currentPlayerId1}
+				/>
+			</ChakraProvider>,
+			{
+				preloadedState: customInitialState,
+			},
+		);
+
+		await waitFor(() => {
+			const player2 = screen.getByTestId('player-2');
+			fireEvent.click(player2);
+		});
+
+		await waitFor(() => {
+			const state = store.getState();
+			expect(state.playArea.card).toEqual({
+				card: {
+					id: '0',
+					token: 'img22.jpg',
+					type: 1,
+				},
+				target: 2,
 			});
 		});
 	});
