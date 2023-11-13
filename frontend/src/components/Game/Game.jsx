@@ -25,6 +25,7 @@ import {
 } from '../../appActions';
 import {endTurn} from '../request/endTurn';
 import {FinishGame} from '../../containers/FinishGame';
+import Logs from './Logs';
 export const Game = () => {
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
 	const currentPlayer = useSelector((state) => state.game.currentPlayer);
@@ -32,6 +33,9 @@ export const Game = () => {
 	const dispatch = useDispatch();
 	const gameStatus = useSelector((state) => state.game.isFinish);
 	const [socketChat, setSocketChat] = useState(null);
+
+	const [socketLogs, setSocketLogs] = useState(null);
+
 	useEffect(() => {
 		const connection = new WebSocket('ws://localhost:8000/ws/game_status'); // testearlo al ws o http.
 		console.log(connection);
@@ -73,6 +77,14 @@ export const Game = () => {
 		setSocketChat(connection);
 	}, [idPlayer]);
 
+	// Chat
+	useEffect(() => {
+		const connection = new WebSocket(
+			`ws://localhost:8000/ws/logs?id_player=${idPlayer}`,
+		);
+		setSocketLogs(connection);
+	}, [idPlayer]);
+
 	async function finishTurn() {
 		try {
 			const response = await endTurn(idGame);
@@ -98,8 +110,8 @@ export const Game = () => {
 					templateColumns='repeat(9, 1fr)'
 					gap={4}
 				>
-					<GridItem textAlign='center' bg='yellow' rowSpan={7} colSpan={2}>
-						<Text>logs</Text>
+					<GridItem textAlign='center' rowSpan={7} colSpan={2}>
+						<Logs connection={socketLogs} />
 					</GridItem>
 					<GridItem bg='white' rowSpan={1} colSpan={1} />
 					<GridItem bg='white' rowSpan={1} colSpan={3} paddingTop='40px'>
