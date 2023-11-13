@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
 import PlayerIcons from './PlayerIcons';
-import {waitFor, screen} from '@testing-library/react';
+import {waitFor, screen, fireEvent} from '@testing-library/react';
 import {renderWithProviders} from '../../services/providerForTest/utils-for-tests';
 import {ChakraProvider} from '@chakra-ui/react';
 
@@ -38,7 +38,7 @@ describe('Player Icons tests', () => {
 					type: 1,
 				},
 			],
-			selectedCard: null,
+			selectedCard: {id: '0', token: 'img22.jpg', type: 1},
 			alreadyPlayed: false,
 			alreadyPicked: false,
 		},
@@ -98,6 +98,42 @@ describe('Player Icons tests', () => {
 			expect(screen.getByTestId('player-3')).toHaveStyle(
 				'background-color: gray.900',
 			);
+		});
+	});
+
+	it('should let the player select a valid target', async () => {
+		window.sessionStorage.setItem('player', JSON.stringify(player));
+		window.sessionStorage.setItem('gameId', 1);
+
+		// eslint-disable-next-line no-unused-vars
+		const {store, _rtl} = renderWithProviders(
+			<ChakraProvider>
+				<PlayerIcons
+					relativePositionToTable={realativePositionToTable1}
+					players={players1}
+					currentPlayerId={currentPlayerId1}
+				/>
+			</ChakraProvider>,
+			{
+				preloadedState: customInitialState,
+			},
+		);
+
+		await waitFor(() => {
+			const player3 = screen.getByTestId('player-3');
+			fireEvent.click(player3);
+		});
+
+		await waitFor(() => {
+			const state = store.getState();
+			expect(state.playArea.card).toEqual({
+				card: {
+					id: '0',
+					token: 'img22.jpg',
+					type: 1,
+				},
+				target: 3,
+			});
 		});
 	});
 });
