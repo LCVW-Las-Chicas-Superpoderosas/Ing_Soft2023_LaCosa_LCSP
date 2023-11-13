@@ -12,6 +12,11 @@ export const requiresTarget = (cardToken) => {
 	return cardName === 'lanzallamas' || cardName === 'cambio de lugar';
 };
 
+export const isPanic = (cardToken) => {
+	const cardName = getCardName(cardToken);
+	return cardName === 'panico';
+};
+
 /* Get a card's name from a token
    ! Van solo listadas las cartas implementadas y las de infección
 */
@@ -33,6 +38,9 @@ const getCardName = (cardToken) => {
 
 		case cardID >= 50 && cardID <= 54:
 			return 'cambio de lugar';
+
+		case cardID >= 89 && cardID <= 108:
+			return 'panico';
 
 		default:
 			return null;
