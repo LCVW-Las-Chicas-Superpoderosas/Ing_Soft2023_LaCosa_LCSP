@@ -38,9 +38,7 @@ import {endTurn} from '../request/endTurn';
 import {FinishGame} from '../../containers/FinishGame';
 import Defense from '../Defense/Defense';
 import {v4 as uuidv4} from 'uuid';
-import {appendToHand} from '../../services/handSlice';
 import getCard from '../request/getCard';
-const TYPE_PANIC = 0;
 
 export const Game = () => {
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
@@ -85,9 +83,10 @@ export const Game = () => {
 		// se utiliza para levantar una carta si jugaste una carta de defensa
 		const pickUpCard = async (idPlayer) => {
 			const res = await getCard({idPlayer});
-			let pickedCards = res.pickedCards[0];
+			console.log(res);
+			// const pickedCards = res.pickedCards[0];
 
-			setTimeout(async () => {
+			/* setTimeout(async () => {
 				while (pickedCards.type === TYPE_PANIC) {
 					const res = await getCard({idPlayer});
 					pickedCards = res.pickedCards[0];
@@ -95,7 +94,7 @@ export const Game = () => {
 				dispatch(appendToHand([pickedCards]));
 
 				// setCard({type: res.nextCardType});
-			}, 1000);
+			}, 1000); */
 		};
 
 		const connection = new WebSocket(
@@ -202,7 +201,6 @@ export const Game = () => {
 
 		dispatch(setUnderAttack(false));
 		dispatch(saveResponse(null));
-
 		onClose();
 	};
 
