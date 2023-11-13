@@ -9,7 +9,11 @@ export default isValidCard;
 /* returns true if card requires a target to be selected in order to be played */
 export const requiresTarget = (cardToken) => {
 	const cardName = getCardName(cardToken);
-	return cardName === 'lanzallamas' || cardName === 'cambio de lugar';
+	return (
+		cardName === 'lanzallamas' ||
+		cardName === 'cambio de lugar' ||
+		cardName === 'sospecha'
+	);
 };
 
 /* Get a card's name from a token
@@ -27,6 +31,9 @@ const getCardName = (cardToken) => {
 
 		case cardID >= 22 && cardID <= 26:
 			return 'lanzallamas';
+
+		case cardID >= 32 && cardID <= 39:
+			return 'sospecha';
 
 		case cardID >= 48 && cardID <= 49:
 			return 'vigila tus espaldas';
