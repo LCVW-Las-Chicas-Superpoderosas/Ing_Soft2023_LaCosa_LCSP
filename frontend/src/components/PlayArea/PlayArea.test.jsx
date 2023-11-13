@@ -121,15 +121,16 @@ describe('PlayArea component', () => {
 		});
 	});
 
-	it("shouldn't play the selected if player is not in turn", async () => {
+	it("shouldn't play the selected card if player is not in turn", async () => {
 		const initialState = {
 			...mockStore,
 			game: {
 				...mockStore.game,
 				currentPlayer: 2,
 			},
-			playArea: {
-				card: {card: {id: '2', token: 'img22.jpg', type: 1}, target: -1},
+			hand: {
+				...mockStore.hand,
+				selectedCard: {id: '0', token: 'img40.jpg', type: 1},
 			},
 		};
 
@@ -138,20 +139,25 @@ describe('PlayArea component', () => {
 			preloadedState: initialState,
 		});
 
-		const spy = jest.spyOn(store, 'dispatch');
-		expect(spy).not.toHaveBeenCalled();
+		await waitFor(async () => {
+			const playArea = screen.getByTestId('play-area');
+			fireEvent.click(playArea);
+		});
+
+		await waitFor(async () => {
+			const state = store.getState();
+			expect(state.playArea.card).toBeNull();
+		});
 	});
 
-	it("shouldn't play the selected if player didn't pick first", async () => {
+	it("shouldn't play the selected card if player didn't pick first", async () => {
 		const initialState = {
 			...mockStore,
 			hand: {
 				...mockStore.hand,
+				selectedCard: {id: '0', token: 'img40.jpg', type: 1},
 				alreadyPicked: false,
 			},
-			playArea: {
-				card: {card: {id: '2', token: 'img22.jpg', type: 1}, target: -1},
-			},
 		};
 
 		// eslint-disable-next-line no-unused-vars
@@ -159,19 +165,24 @@ describe('PlayArea component', () => {
 			preloadedState: initialState,
 		});
 
-		const spy = jest.spyOn(store, 'dispatch');
-		expect(spy).not.toHaveBeenCalled();
+		await waitFor(async () => {
+			const playArea = screen.getByTestId('play-area');
+			fireEvent.click(playArea);
+		});
+
+		await waitFor(async () => {
+			const state = store.getState();
+			expect(state.playArea.card).toBeNull();
+		});
 	});
 
-	it("shouldn't play the selected if player already played a card", async () => {
+	it("shouldn't play the selected card if player already played", async () => {
 		const initialState = {
 			...mockStore,
 			hand: {
 				...mockStore.hand,
+				selectedCard: {id: '0', token: 'img40.jpg', type: 1},
 				alreadyPlayed: true,
-			},
-			playArea: {
-				card: {card: {id: '2', token: 'img22.jpg', type: 1}, target: -1},
 			},
 		};
 
@@ -180,8 +191,15 @@ describe('PlayArea component', () => {
 			preloadedState: initialState,
 		});
 
-		const spy = jest.spyOn(store, 'dispatch');
-		expect(spy).not.toHaveBeenCalled();
+		await waitFor(async () => {
+			const playArea = screen.getByTestId('play-area');
+			fireEvent.click(playArea);
+		});
+
+		await waitFor(async () => {
+			const state = store.getState();
+			expect(state.playArea.card).toBeNull();
+		});
 	});
 
 	it("shouldn't play a card if none is selected", async () => {
@@ -190,11 +208,15 @@ describe('PlayArea component', () => {
 			preloadedState: mockStore,
 		});
 
-		const playArea = screen.getByTestId('play-area');
-		fireEvent.click(playArea);
+		await waitFor(async () => {
+			const playArea = screen.getByTestId('play-area');
+			fireEvent.click(playArea);
+		});
 
-		const spy = jest.spyOn(store, 'dispatch');
-		expect(spy).not.toHaveBeenCalled();
+		await waitFor(async () => {
+			const state = store.getState();
+			expect(state.playArea.card).toBeNull();
+		});
 	});
 });
 
