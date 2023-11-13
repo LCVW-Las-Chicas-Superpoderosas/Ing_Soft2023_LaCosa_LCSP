@@ -16,23 +16,23 @@ const Hand = () => {
 	const response = useSelector((state) => state.playArea.response);
 	const [alert, setAlert] = useState('');
 
-	//console.log('reading response from state in hand', response);
+	// console.log('reading response from state in hand', response);
 
 	let underAttack = false;
-	//console.log('im under atack', underAttack);
+	// console.log('im under atack', underAttack);
 
 	if (response) {
 		underAttack = response.under_attack;
 	}
 
-	//console.log('im under atack', underAttack);
+	// console.log('im under atack', underAttack);
 
 	// when component mounts
 	useEffect(() => {
 		const fetchHand = async () => {
 			const res = await getHand(userId);
 			dispatch(setHand(res.cards));
-			//console.log('fetchHand', res.cards);
+			// console.log('fetchHand', res.cards);
 		};
 		fetchHand();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -47,18 +47,18 @@ const Hand = () => {
 		if (selectedCard !== clickedCard) {
 			setAlert('');
 			if (isValidCard(clickedCard.token)) {
-				//console.log('las condiciones son');
-				//console.log('response', response !== null);
-				//console.log('under attack', underAttack);
+				// console.log('las condiciones son');
+				// console.log('response', response !== null);
+				// console.log('under attack', underAttack);
 				if (response && underAttack) {
-					//console.log('correcto el render de hand cuando te atacan');
+					// console.log('correcto el render de hand cuando te atacan');
 
 					const responseHasDefenseJpg = response.defense_cards;
-					//console.log('response has defense', responseHasDefenseJpg);
+					// console.log('response has defense', responseHasDefenseJpg);
 					// Check if clickedCard is in the response.has_defense array
 					const isOnArray = responseHasDefenseJpg.includes(clickedCard.token);
 
-					//console.log('is on array', isOnArray);
+					// console.log('is on array', isOnArray);
 					if (isOnArray) {
 						dispatch(selectCard(clickedCard));
 					} else {
@@ -67,7 +67,7 @@ const Hand = () => {
 					}
 				} else {
 					dispatch(selectCard(clickedCard));
-					//console.log('selecting card');
+					// console.log('selecting card');
 				}
 			}
 		} else {

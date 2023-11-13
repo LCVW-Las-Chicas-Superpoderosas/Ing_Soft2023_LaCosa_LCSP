@@ -4,17 +4,9 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
 import {Box, Text, Button} from '@chakra-ui/react';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import Hand from '../Hand/Hand';
-import discardCard from '../request/discardCard';
-import {useDispatch} from 'react-redux';
-import {
-	addToDiscardPile,
-	removeFromHand,
-	setAlreadyPlayed,
-	setUnderAttack,
-	saveResponse,
-} from '../../appActions';
+import {setUnderAttack, saveResponse} from '../../appActions';
 // eslint-disable-next-line no-unused-vars
 const response_mock = {
 	under_attack: 1,
@@ -50,18 +42,9 @@ const Defense = ({connection}) => {
 			}
 		}
 
-		const discard = async () => {
-			await discardCard({discardedCard: selectedCard, idPlayer});
-			dispatch(addToDiscardPile(selectedCard));
-			dispatch(removeFromHand(selectedCard));
-			dispatch(setAlreadyPlayed());
-		};
 		dispatch(setUnderAttack(false));
-
 		// here i need to close the modal
 		dispatch(saveResponse(null));
-
-		discard(); // VER CON LA LARAAA
 	};
 
 	let attacker_name = ''; // Declare attacker_name outside the if block

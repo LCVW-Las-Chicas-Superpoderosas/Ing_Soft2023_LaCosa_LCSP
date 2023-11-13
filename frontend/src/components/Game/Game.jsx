@@ -38,6 +38,9 @@ import {endTurn} from '../request/endTurn';
 import {FinishGame} from '../../containers/FinishGame';
 import Defense from '../Defense/Defense';
 import {v4 as uuidv4} from 'uuid';
+import {appendToHand} from '../../services/handSlice';
+import getCard from '../request/getCard';
+const TYPE_PANIC = 0;
 
 export const Game = () => {
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
@@ -46,26 +49,14 @@ export const Game = () => {
 	const dispatch = useDispatch();
 	const gameStatus = useSelector((state) => state.game.isFinish);
 	const {isOpen, onOpen, onClose} = useDisclosure();
-	// const [displayDefense, setDisplayDefense] = useState(false);
 	const displayDefense = useSelector((state) => state.game.underAttack);
 	const [conHandPlay, setconHandPlay] = useState(null);
-	// const playedCard = useSelector((state) => state.playArea.card);
-	// const selectedCard = useSelector((state) => state.hand.selectedCard);
 	const [target, setTarget] = useState(null);
-
-	/* const playresponse = JSON.stringify(
-		useSelector((state) => state.playArea.response),
-	); */
-
-	// useEffect to close the modal and reset displayDefense when isOpen becomes false
 
 	useEffect(() => {
 		const connection = new WebSocket('ws://localhost:8000/ws/game_status'); // testearlo al ws o http.
 
 		connection.onopen = () => {
-			// console.log('***ONOPEN id=', idPlayer);
-			// send the playerid
-
 			const idToSend = {type: 'game_status', content: {id_player: idPlayer}};
 			// console.log('sending ', JSON.stringify(idToSend));
 			// console.log('on the web socket');
@@ -84,32 +75,52 @@ export const Game = () => {
 		connection.onmessage = function (response) {
 			// console.log('on message: ', response);
 			const resp = JSON.parse(response.data);
+			console.log(resp);
 			const gameStatus = getGameStatus(resp, idPlayer);
 			getDataOfGame(gameStatus);
 		};
 	}, [idPlayer, dispatch, displayDefense]);
 
 	useEffect(() => {
+		// se utiliza para levantar una carta si jugaste una carta de defensa
+		const pickUpCard = async (idPlayer) => {
+			const res = await getCard({idPlayer});
+			let pickedCards = res.pickedCards[0];
+
+			setTimeout(async () => {
+				while (pickedCards.type === TYPE_PANIC) {
+					const res = await getCard({idPlayer});
+					pickedCards = res.pickedCards[0];
+				}
+				dispatch(appendToHand([pickedCards]));
+
+				// setCard({type: res.nextCardType});
+			}, 1000);
+		};
+
 		const connection = new WebSocket(
 			`ws://localhost:8000/ws/hand_play?id_player=${idPlayer}`,
-		); // testearlo al ws o http.
-		console.log(connection);
+		);
+		// console.log(connection);
 		console.log('***CREATED WEBSOCKET');
 		setconHandPlay(connection);
 
-		connection.onmessage = function (response) {
-			// types defense y play_card
-			console.log('LISTENING CONECTION');
-			console.log('on message de play: ', response);
+		connection.onmessage = async function (response) {
+			// handeling mesajes types defense y play_card
+
+			// console.log('LISTENING CONECTION');
+			// console.log('on message de play: ', response.data);
 			const resp = JSON.parse(response.data);
-			console.log('RESPONSE FROM BACK', resp);
+			// console.log('RESPONSE FROM BACK', resp);
 
 			if (resp.status_code === 400) {
-				alert(resp);
+				// si hay un error se muestra con un alert
+				alert(resp.detail);
 			} else {
 				if (resp.data.type === 'play_card') {
 					console.log('status code ', resp.status_code, resp.detail);
 
+					// si me envian la mano desde el back la seteo y cierro el modal en caso de que este abierto
 					if (resp.data.hand) {
 						const cards = resp.data.hand.map((card) => ({
 							id: uuidv4(),
@@ -121,14 +132,16 @@ export const Game = () => {
 						dispatch(setHand(cards));
 						onClose();
 					}
-
-					// ver la mano del jugador como manejarla
 				} else if (resp.data.type === 'defense') {
 					console.log('ON DEFENSE RESP FROM BACK', resp.status_code);
 					console.log(resp.data);
+					// guardo el resultado para leerlo desde otros modulos
 					dispatch(saveResponse(resp.data));
+					// guarlo la variable under_attack para manejar el modal
 					dispatch(setUnderAttack(resp.data.under_attack));
+					// seteo el target para enviar en caso que decida no defenderme sendEmptyPlay()
 					setTarget(resp.data.attacker_id);
+					// si me envian la mano desde el back la seteo y cierro el modal en caso de que este abierto
 					if (resp.data.hand) {
 						const cards = resp.data.hand.map((card) => ({
 							id: uuidv4(),
@@ -138,11 +151,17 @@ export const Game = () => {
 
 						console.log('the cards are', cards);
 						dispatch(setHand(cards));
+
+						// i need to pick up a card
+						console.log('pickUpCard');
+						pickUpCard(idPlayer);
+
 						onClose();
 					}
 				} else if (resp.data.type === 'exchange_offer') {
 					// should add the exchange logic
 				} else {
+					// si no hay un error pero es un type que no estamos usando se muestra un alert
 					console.log('the type is not valid', resp.type);
 					alert('the type is not valid', resp.type);
 				}
@@ -150,22 +169,12 @@ export const Game = () => {
 		};
 
 		if (displayDefense) {
+			// si estamos under_attack se llama a abrir el modal DEFENSE
 			onOpen();
 		}
 
-		return () => {
-			// connection.close();
-			console.log('on return');
-		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [idPlayer, dispatch, displayDefense, setconHandPlay]);
-
-	/* 	const SetDefense = () => {
-		console.log('before set' + displayDefense);
-
-		setDisplayDefense(true);
-		console.log('after set' + displayDefense);
-	}; */
 
 	async function finishTurn() {
 		try {
@@ -178,6 +187,7 @@ export const Game = () => {
 		}
 	}
 
+	// cuando decido que no voy a defenderme se envia un play con do_defense falso
 	const sendEmptyPlay = () => {
 		const body = {
 			content: {
@@ -202,8 +212,7 @@ export const Game = () => {
 		return (
 			<Center h='100%' w='100%'>
 				<>
-					{/*		<Button onClick={SetDefense}>Open Modal</Button> */}
-
+					{/*		Modal que se encarga de la defensa */}
 					<Modal isOpen={isOpen} onClose={onClose}>
 						<ModalOverlay
 							bg='none'
@@ -212,8 +221,6 @@ export const Game = () => {
 							backdropBlur='2px'
 						/>
 						<ModalContent maxW='xl'>
-							{' '}
-							{/* Set max width here, 'xl' for extra-large, adjust as needed */}
 							<ModalHeader>Quieres defenderte?</ModalHeader>
 							<ModalCloseButton />
 							<ModalBody>
@@ -231,9 +238,6 @@ export const Game = () => {
 						</ModalContent>
 					</Modal>
 				</>
-				{/* <Text color='red' fontSize='xl' fontWeight='bold'>
-					{playresponse}
-				</Text> */}
 				<Grid
 					h='90vh'
 					w='90vw'
