@@ -37,6 +37,7 @@ describe('PlayArea component', () => {
 		const initialState = {
 			...mockStore,
 			hand: {
+				...mockStore.hand,
 				selectedCard: {id: '0', token: 'img40.jpg', type: 1},
 			},
 		};
@@ -47,14 +48,15 @@ describe('PlayArea component', () => {
 		});
 
 		await waitFor(async () => {
-			store.dispatch = jest.fn();
 			const playArea = screen.getByTestId('play-area');
-
 			fireEvent.click(playArea);
+		});
 
+		await waitFor(async () => {
 			const state = store.getState();
-			expect(state.playArea).toStrictEqual({
-				card: {card: {id: '0', token: 'img40.jpg', type: 1}, target: -1},
+			expect(state.playArea.card).toStrictEqual({
+				card: {id: '0', token: 'img40.jpg', type: 1},
+				target: -1,
 			});
 		});
 	});
