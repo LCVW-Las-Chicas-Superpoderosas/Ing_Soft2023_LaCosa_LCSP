@@ -88,8 +88,10 @@ export const Game = () => {
 		// se utiliza para levantar una carta si jugaste una carta de defensa
 		const pickUpCard = async (idPlayer) => {
 			const res = await getCard({idPlayer});
+			console.log('nueva carta', res);
 			const pickedCards = res.pickedCards[0];
 			dispatch(appendToHand([pickedCards]));
+			console.log('voy a agregar la carta', pickedCards);
 		};
 
 		const connection = new WebSocket(
@@ -147,8 +149,10 @@ export const Game = () => {
 						dispatch(setHand(cards));
 
 						// i need to pick up a card
-						console.log('pickUpCard');
-						pickUpCard(idPlayer);
+						if (resp.data.under_attack === false) {
+							console.log('pickUpCard');
+							pickUpCard(idPlayer);
+						}
 
 						onCloseDefense();
 					}
