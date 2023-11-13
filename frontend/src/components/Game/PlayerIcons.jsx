@@ -2,6 +2,7 @@ import {Avatar, Text} from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {addToPlayArea} from '../../appActions';
+import {requiresTarget} from '../../services/cardConditions';
 
 export const PlayerIcons = ({
 	relativePositionToTable,
@@ -10,6 +11,8 @@ export const PlayerIcons = ({
 }) => {
 	const myPlayerId = JSON.parse(sessionStorage.getItem('player')).id;
 	const selectedCard = useSelector((state) => state.hand.selectedCard);
+	const alreadyPlayed = useSelector((state) => state.hand.alreadyPlayed);
+	const alreadyPicked = useSelector((state) => state.hand.alreadyPicked);
 	const dispatch = useDispatch();
 
 	const renderPlayer = (player) => {
@@ -24,10 +27,21 @@ export const PlayerIcons = ({
 			);
 		};
 
+		const canPlayOnTarget = () => {
+			return (
+				myPlayerId === currentPlayerId &&
+				selectedCard &&
+				alreadyPicked &&
+				!alreadyPlayed &&
+				requiresTarget(selectedCard.token) &&
+				validTarget(player)
+			);
+		};
+
 		/* if a player is clicked with a card selected the card is sent to the
 		play area with the player clicked as the target */
 		const handleClick = (player) => {
-			if (selectedCard && validTarget(player)) {
+			if (selectedCard && canPlayOnTarget()) {
 				dispatch(addToPlayArea({card: selectedCard, target: player.id}));
 			}
 		};
