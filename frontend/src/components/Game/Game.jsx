@@ -37,6 +37,7 @@ import {
 import {endTurn} from '../request/endTurn';
 import {FinishGame} from '../../containers/FinishGame';
 import Defense from '../Defense/Defense';
+import {v4 as uuidv4} from 'uuid';
 
 export const Game = () => {
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
@@ -110,11 +111,15 @@ export const Game = () => {
 					console.log('status code ', resp.status_code, resp.detail);
 
 					if (resp.data.hand) {
-						// setear mano del usuario
-						dispatch(setHand(resp.data.hand));
-						/* dispatch(addToDiscardPile(selectedCard));
-						dispatch(removeFromHand(selectedCard));
-						dispatch(setAlreadyPlayed()); */
+						const cards = resp.data.hand.map((card) => ({
+							id: uuidv4(),
+							token: card.card_token,
+							type: card.type,
+						}));
+
+						console.log('the cards are', cards);
+						dispatch(setHand(cards));
+						onClose();
 					}
 
 					// ver la mano del jugador como manejarla
@@ -125,7 +130,14 @@ export const Game = () => {
 					dispatch(setUnderAttack(resp.data.under_attack));
 					setTarget(resp.data.attacker_id);
 					if (resp.data.hand) {
-						dispatch(setHand(resp.data.hand));
+						const cards = resp.data.hand.map((card) => ({
+							id: uuidv4(),
+							token: card.card_token,
+							type: card.type,
+						}));
+
+						console.log('the cards are', cards);
+						dispatch(setHand(cards));
 						onClose();
 					}
 				} else if (resp.data.type === 'exchange_offer') {
