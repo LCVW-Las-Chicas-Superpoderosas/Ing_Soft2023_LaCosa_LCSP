@@ -6,6 +6,7 @@ const initialState = {
 	isFinish: 1,
 	currentPlayer: 0,
 	firstDeckCardBack: -1,
+	cardModalIsOpen: false,
 };
 
 const gameSlice = createSlice({
@@ -27,6 +28,12 @@ const gameSlice = createSlice({
 		setFirstDeckCardBack: (state, action) => {
 			state.firstDeckCardBack = action.payload;
 		},
+		openCardModal: (state) => {
+			state.cardModalIsOpen = true;
+		},
+		closeCardModal: (state) => {
+			state.cardModalIsOpen = false;
+		},
 	},
 });
 
@@ -36,5 +43,7 @@ export const {
 	setIsFinish,
 	setCurrentPlayer,
 	setFirstDeckCardBack,
+	openCardModal,
+	closeCardModal,
 } = gameSlice.actions;
 export default gameSlice.reducer;
