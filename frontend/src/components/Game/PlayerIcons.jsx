@@ -34,13 +34,13 @@ export const PlayerIcons = ({
 
 		return (
 			<button
+				key={player.id}
 				onClick={() => {
 					handleClick(player);
 				}}
 			>
 				<Avatar
 					size='lg'
-					key={player.id}
 					color='white'
 					bg={avatarColor(currentPlayerId, player)}
 					border={myPlayerId === player.id ? '2px solid blue' : '0px'}
