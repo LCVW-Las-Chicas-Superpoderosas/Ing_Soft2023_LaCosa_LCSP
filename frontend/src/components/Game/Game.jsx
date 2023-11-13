@@ -39,6 +39,7 @@ import {FinishGame} from '../../containers/FinishGame';
 import Defense from '../Defense/Defense';
 import {v4 as uuidv4} from 'uuid';
 import getCard from '../request/getCard';
+import {appendToHand} from '../../services/handSlice';
 
 export const Game = () => {
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
@@ -46,7 +47,11 @@ export const Game = () => {
 	const idGame = JSON.parse(sessionStorage.getItem('gameId')).id;
 	const dispatch = useDispatch();
 	const gameStatus = useSelector((state) => state.game.isFinish);
-	const {isOpen, onOpen, onClose} = useDisclosure();
+	const {
+		isOpen: isOpenDefense,
+		onOpen: onOpenDefense,
+		onClose: onCloseDefense,
+	} = useDisclosure();
 	const displayDefense = useSelector((state) => state.game.underAttack);
 	const [conHandPlay, setconHandPlay] = useState(null);
 	const [target, setTarget] = useState(null);
@@ -83,18 +88,8 @@ export const Game = () => {
 		// se utiliza para levantar una carta si jugaste una carta de defensa
 		const pickUpCard = async (idPlayer) => {
 			const res = await getCard({idPlayer});
-			console.log(res);
-			// const pickedCards = res.pickedCards[0];
-
-			/* setTimeout(async () => {
-				while (pickedCards.type === TYPE_PANIC) {
-					const res = await getCard({idPlayer});
-					pickedCards = res.pickedCards[0];
-				}
-				dispatch(appendToHand([pickedCards]));
-
-				// setCard({type: res.nextCardType});
-			}, 1000); */
+			const pickedCards = res.pickedCards[0];
+			dispatch(appendToHand([pickedCards]));
 		};
 
 		const connection = new WebSocket(
@@ -129,7 +124,7 @@ export const Game = () => {
 
 						console.log('the cards are', cards);
 						dispatch(setHand(cards));
-						onClose();
+						onCloseDefense();
 					}
 				} else if (resp.data.type === 'defense') {
 					console.log('ON DEFENSE RESP FROM BACK', resp.status_code);
@@ -155,7 +150,7 @@ export const Game = () => {
 						console.log('pickUpCard');
 						pickUpCard(idPlayer);
 
-						onClose();
+						onCloseDefense();
 					}
 				} else if (resp.data.type === 'exchange_offer') {
 					// should add the exchange logic
@@ -169,7 +164,7 @@ export const Game = () => {
 
 		if (displayDefense) {
 			// si estamos under_attack se llama a abrir el modal DEFENSE
-			onOpen();
+			onOpenDefense();
 		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -201,7 +196,7 @@ export const Game = () => {
 
 		dispatch(setUnderAttack(false));
 		dispatch(saveResponse(null));
-		onClose();
+		onCloseDefense();
 	};
 
 	if (gameStatus === 2) {
@@ -211,7 +206,7 @@ export const Game = () => {
 			<Center h='100%' w='100%'>
 				<>
 					{/*		Modal que se encarga de la defensa */}
-					<Modal isOpen={isOpen} onClose={onClose}>
+					<Modal isOpen={isOpenDefense} onCloseDefense={onCloseDefense}>
 						<ModalOverlay
 							bg='none'
 							backdropFilter='auto'

@@ -36,7 +36,7 @@ const PlayArea = ({connection}) => {
 		// prevent applyCardEffect from running when playedCard changes state
 		// but it's not a valid card -> caused by react strict mode
 		if (!playedCard || alreadyPlayed || idPlayer !== playerInTurn) {
-			// console.log('Error: invalid play');
+			console.log('Error: invalid play');
 			return;
 		}
 
