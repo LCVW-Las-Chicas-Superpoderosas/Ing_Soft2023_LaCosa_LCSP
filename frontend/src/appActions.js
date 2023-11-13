@@ -27,3 +27,4 @@ export const setPositionInGame = createAction('game/setPosition');
 export const setIsFinish = createAction('game/setIsFinish');
 export const setCurrentPlayerInGame = createAction('game/setCurrentPlayer');
 export const setFirstDeckCardBack = createAction('game/setFirstDeckCardBack');
+export const setUnderAttack = createAction('game/setUnderAttack');

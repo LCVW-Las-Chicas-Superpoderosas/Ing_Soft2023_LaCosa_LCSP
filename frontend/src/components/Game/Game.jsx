@@ -18,6 +18,7 @@ import {
 	ModalHeader,
 	ModalFooter,
 	ModalBody,
+	ModalCloseButton,
 	useDisclosure,
 } from '@chakra-ui/react';
 import {useDispatch, useSelector} from 'react-redux';
@@ -30,6 +31,8 @@ import {
 	setIsFinish,
 	restoreTurnConditions,
 	saveResponse,
+	setUnderAttack,
+	setHand,
 } from '../../appActions';
 import {endTurn} from '../request/endTurn';
 import {FinishGame} from '../../containers/FinishGame';
@@ -42,18 +45,18 @@ export const Game = () => {
 	const dispatch = useDispatch();
 	const gameStatus = useSelector((state) => state.game.isFinish);
 	const {isOpen, onOpen, onClose} = useDisclosure();
-	const [displayDefense, setDisplayDefense] = useState(false);
+	// const [displayDefense, setDisplayDefense] = useState(false);
+	const displayDefense = useSelector((state) => state.game.underAttack);
 	const [conHandPlay, setconHandPlay] = useState(null);
+	// const playedCard = useSelector((state) => state.playArea.card);
+	// const selectedCard = useSelector((state) => state.hand.selectedCard);
+	const [target, setTarget] = useState(null);
+
 	/* const playresponse = JSON.stringify(
 		useSelector((state) => state.playArea.response),
 	); */
 
 	// useEffect to close the modal and reset displayDefense when isOpen becomes false
-	useEffect(() => {
-		if (!isOpen) {
-			setDisplayDefense(false);
-		}
-	}, [isOpen]);
 
 	useEffect(() => {
 		const connection = new WebSocket('ws://localhost:8000/ws/game_status'); // testearlo al ws o http.
@@ -83,11 +86,6 @@ export const Game = () => {
 			const gameStatus = getGameStatus(resp, idPlayer);
 			getDataOfGame(gameStatus);
 		};
-
-		return () => {
-			// connection.close();
-			// console.log('on return');
-		};
 	}, [idPlayer, dispatch, displayDefense]);
 
 	useEffect(() => {
@@ -98,44 +96,44 @@ export const Game = () => {
 		console.log('***CREATED WEBSOCKET');
 		setconHandPlay(connection);
 
-		/* 	connection.onopen = () => {
-			console.log('***ONOPEN id=', idPlayer);
-			// send the playerid
-
-			// {"id_player": int , card_token: str, : int, data}
-
-			const idToSend = {
-				content: {id_player: idPlayer},
-			};
-			console.log('sending ', JSON.stringify(idToSend));
-			console.log('on the web socket');
-			connection.send(JSON.stringify(idToSend)); // event: game_status. 
-		}; */
-
 		connection.onmessage = function (response) {
 			// types defense y play_card
+			console.log('LISTENING CONECTION');
 			console.log('on message de play: ', response);
 			const resp = JSON.parse(response.data);
+			console.log('RESPONSE FROM BACK', resp);
 
-			if (resp.type === 'play_card') {
-				if (resp.status_code === 400) {
-					alert(resp.detail);
-				} else {
-					console.log('status code ', resp.status_code, resp.detail);
-					// ver la mano del jugador como manejarla
-				}
-			} else if (resp.type === 'defense') {
-				if (resp.status_code === 400) {
-					alert(resp.detail);
-				} else {
-					dispatch(saveResponse(resp.data));
-					setDisplayDefense(resp.under_attack);
-				}
-			} else if (resp.type === 'exchange') {
-				// should add the exchange logic
+			if (resp.status_code === 400) {
+				alert(resp);
 			} else {
-				console.log('the type is not valid', resp.type);
-				alert('the type is not valid', resp.type);
+				if (resp.data.type === 'play_card') {
+					console.log('status code ', resp.status_code, resp.detail);
+
+					if (resp.data.hand) {
+						// setear mano del usuario
+						dispatch(setHand(resp.data.hand));
+						/* dispatch(addToDiscardPile(selectedCard));
+						dispatch(removeFromHand(selectedCard));
+						dispatch(setAlreadyPlayed()); */
+					}
+
+					// ver la mano del jugador como manejarla
+				} else if (resp.data.type === 'defense') {
+					console.log('ON DEFENSE RESP FROM BACK', resp.status_code);
+					console.log(resp.data);
+					dispatch(saveResponse(resp.data));
+					dispatch(setUnderAttack(resp.data.under_attack));
+					setTarget(resp.data.attacker_id);
+					if (resp.data.hand) {
+						dispatch(setHand(resp.data.hand));
+						onClose();
+					}
+				} else if (resp.data.type === 'exchange_offer') {
+					// should add the exchange logic
+				} else {
+					console.log('the type is not valid', resp.type);
+					alert('the type is not valid', resp.type);
+				}
 			}
 		};
 
@@ -169,13 +167,19 @@ export const Game = () => {
 	}
 
 	const sendEmptyPlay = () => {
-		const bodyTosend = {
-			idPlayer,
-			type: 'defense',
-			playedCard: null,
-			targetId: null,
+		const body = {
+			content: {
+				id_player: idPlayer,
+				type: 'defense',
+				target_id: target,
+				do_defense: false,
+			},
 		};
-		conHandPlay.send(JSON.stringify(bodyTosend));
+		console.log('sending NOT PLAYED', body);
+		conHandPlay.send(JSON.stringify(body));
+
+		dispatch(setUnderAttack(false));
+		dispatch(saveResponse(null));
 
 		onClose();
 	};
@@ -199,6 +203,7 @@ export const Game = () => {
 							{' '}
 							{/* Set max width here, 'xl' for extra-large, adjust as needed */}
 							<ModalHeader>Quieres defenderte?</ModalHeader>
+							<ModalCloseButton />
 							<ModalBody>
 								<Defense connection={conHandPlay} />
 							</ModalBody>

@@ -1,6 +1,6 @@
 const getGameStatus = (response, idPlayer) => {
 	const json = response;
-	console.log('json de getGameStatus ', json);
+	// console.log('json de getGameStatus ', json);
 	const player = json.data.players.find(
 		(player) => player.id === idPlayer,
 	)?.position;

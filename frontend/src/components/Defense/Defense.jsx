@@ -6,7 +6,15 @@ import React from 'react';
 import {Box, Text, Button} from '@chakra-ui/react';
 import {useSelector} from 'react-redux';
 import Hand from '../Hand/Hand';
-
+import discardCard from '../request/discardCard';
+import {useDispatch} from 'react-redux';
+import {
+	addToDiscardPile,
+	removeFromHand,
+	setAlreadyPlayed,
+	setUnderAttack,
+	saveResponse,
+} from '../../appActions';
 // eslint-disable-next-line no-unused-vars
 const response_mock = {
 	under_attack: 1,
@@ -19,6 +27,7 @@ const Defense = ({connection}) => {
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
 	const response = useSelector((state) => state.playArea.response);
 	const selectedCard = useSelector((state) => state.hand.selectedCard);
+	const dispatch = useDispatch();
 	console.log('reading selectedCard from state', selectedCard);
 	console.log('reading response from state');
 	console.log(response);
@@ -32,23 +41,36 @@ const Defense = ({connection}) => {
 						type: 'defense',
 						card_token: selectedCard.token,
 						target_id: response.attacker_id,
+						do_defense: true,
 					},
 				};
 
-				console.log('sending ', JSON.stringify(bodyTosend));
+				console.log('sending PLAYED', JSON.stringify(bodyTosend));
 				connection.send(JSON.stringify(bodyTosend));
 			}
 		}
+
+		const discard = async () => {
+			await discardCard({discardedCard: selectedCard, idPlayer});
+			dispatch(addToDiscardPile(selectedCard));
+			dispatch(removeFromHand(selectedCard));
+			dispatch(setAlreadyPlayed());
+		};
+		dispatch(setUnderAttack(false));
+
+		// here i need to close the modal
+		dispatch(saveResponse(null));
+
+		discard(); // VER CON LA LARAAA
 	};
+
 	let attacker_name = ''; // Declare attacker_name outside the if block
-	const imgSrc = ''; // Declare imgSrc outside the if block
 	let expr = ''; // Declare expr outside the if block
 
 	if (response !== null) {
 		console.log('reading response from state in the if', response);
 		attacker_name = response.attacker_name;
 		console.log('attacker name is ', attacker_name);
-		console.log('imgSrc is ', imgSrc);
 		expr = response.card_being_played;
 		console.log('expr is ', expr);
 	}
@@ -65,7 +87,7 @@ const Defense = ({connection}) => {
 			</Button>
 		</Box>
 	) : (
-		<Text color='whatsapp.700' fontSize='md' fontWeight='bold' mb={5}>
+		<Text color='whatsapp.700' fontSize='md' fontWeight='bold' mb={5} mt={4}>
 			The defense card information is not available
 		</Text>
 	);

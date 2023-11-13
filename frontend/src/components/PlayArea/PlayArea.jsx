@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
 // import getGameStatus from '../request/getGameStatus';
 
 const PlayArea = ({connection}) => {
-	console.log('PlayArea connection is', connection);
+	////console.log('PlayArea connection is', connection);
 	const dispatch = useDispatch();
 
 	const selectedCard = useSelector((state) => state.hand.selectedCard);
@@ -36,7 +36,11 @@ const PlayArea = ({connection}) => {
 		// prevent applyCardEffect from running when playedCard changes state
 		// but it's not a valid card -> caused by react strict mode
 		if (!playedCard || alreadyPlayed || idPlayer !== playerInTurn) {
-			// console.log('Error: invalid play');
+			//console.log(playedCard);
+			//console.log(alreadyPlayed);
+			//console.log(idPlayer);
+			//console.log(playerInTurn);
+			//console.log('Error: invalid play');
 			return;
 		}
 
@@ -51,6 +55,8 @@ const PlayArea = ({connection}) => {
 			};
 			console.log('sending ', body);
 			connection.send(JSON.stringify(body));
+			cleanPlayArea();
+			//
 		};
 
 		applyCardEffect();

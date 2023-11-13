@@ -16,19 +16,23 @@ const Hand = () => {
 	const response = useSelector((state) => state.playArea.response);
 	const [alert, setAlert] = useState('');
 
-	console.log('reading response from state in hand', response);
+	//console.log('reading response from state in hand', response);
+
+	let underAttack = false;
+	//console.log('im under atack', underAttack);
 
 	if (response) {
-		console.log('reading response from state in hand', response);
+		underAttack = response.under_attack;
 	}
-	const underAttack = response?.under_attack;
+
+	//console.log('im under atack', underAttack);
 
 	// when component mounts
 	useEffect(() => {
 		const fetchHand = async () => {
 			const res = await getHand(userId);
 			dispatch(setHand(res.cards));
-			console.log('fetchHand', res.cards);
+			//console.log('fetchHand', res.cards);
 		};
 		fetchHand();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -40,22 +44,21 @@ const Hand = () => {
 	*/
 
 	const handleClick = async (clickedCard) => {
-		function addJpgExtension(array) {
-			return array.map((item) => `${item}.jpg`);
-		}
-
 		if (selectedCard !== clickedCard) {
 			setAlert('');
 			if (isValidCard(clickedCard.token)) {
-				if (response && response.defense_cards && underAttack) {
-					// si te estan atacando
-					// const response_sin_jpg = ['img40', 'img70'];
-					// const response_mock = addJpgExtension(response_sin_jpg);
+				//console.log('las condiciones son');
+				//console.log('response', response !== null);
+				//console.log('under attack', underAttack);
+				if (response && underAttack) {
+					//console.log('correcto el render de hand cuando te atacan');
 
-					const responseHasDefenseJpg = addJpgExtension(response.defense_cards);
-
+					const responseHasDefenseJpg = response.defense_cards;
+					//console.log('response has defense', responseHasDefenseJpg);
 					// Check if clickedCard is in the response.has_defense array
 					const isOnArray = responseHasDefenseJpg.includes(clickedCard.token);
+
+					//console.log('is on array', isOnArray);
 					if (isOnArray) {
 						dispatch(selectCard(clickedCard));
 					} else {
@@ -64,6 +67,7 @@ const Hand = () => {
 					}
 				} else {
 					dispatch(selectCard(clickedCard));
+					//console.log('selecting card');
 				}
 			}
 		} else {
@@ -93,7 +97,8 @@ const Hand = () => {
 					</Box>
 				))}
 			</HStack>
-			<Text color='whatsapp.700' fontSize='md' fontWeight='bold' mb={5}>
+
+			<Text color='whatsapp.700' fontSize='md' fontWeight='bold' mt={4} mb={5}>
 				{alert}
 			</Text>
 		</>
