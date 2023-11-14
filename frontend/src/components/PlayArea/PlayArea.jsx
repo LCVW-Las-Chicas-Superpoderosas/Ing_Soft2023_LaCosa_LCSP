@@ -12,7 +12,11 @@ import {
 import playCard from '../request/playCard';
 import {Box} from '@chakra-ui/react';
 import getGameStatus from '../request/getGameStatus';
-import {requiresTarget, isDefense} from '../../services/cardConditions';
+import {
+	requiresTarget,
+	isDefense,
+	isInfection,
+} from '../../services/cardConditions';
 
 const PlayArea = () => {
 	const dispatch = useDispatch();
@@ -33,7 +37,8 @@ const PlayArea = () => {
 			alreadyPicked &&
 			idPlayer === playerInTurn &&
 			!requiresTarget(selectedCard.token) &&
-			!isDefense(selectedCard.token)
+			!isDefense(selectedCard.token) &&
+			!isInfection(selectedCard.token)
 			// ? && !isObstacle(selectedCard.token)
 		);
 	};
