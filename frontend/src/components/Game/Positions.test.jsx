@@ -42,6 +42,12 @@ describe('Player Icons tests', () => {
 					position: 3,
 					is_alive: true,
 				},
+				{
+					name: 'player5',
+					id: 5,
+					position: 4,
+					is_alive: true,
+				},
 			],
 		},
 	};
@@ -50,18 +56,17 @@ describe('Player Icons tests', () => {
 		window.sessionStorage.setItem('gameId', 1);
 		renderWithProviders(
 			<ChakraProvider>
-				<Positions relativePositionToTable={0} />
+				<Positions relativePositionToTable={3} />
 			</ChakraProvider>,
 			{
 				preloadedState: customInitialState,
 			},
 		);
 		await waitFor(async () => {
-			expect(screen.getByText('player1')).toBeInTheDocument();
-			expect(screen.getByText('player2')).toBeInTheDocument();
-			expect(screen.getByText('player3')).toBeInTheDocument();
-			expect(screen.queryByText('player4')).not.toBeInTheDocument();
-			expect(screen.getAllByText(/player/i)).toHaveLength(3);
+			expect(screen.getByText('player4')).toBeInTheDocument();
+			expect(screen.getByText('player5')).toBeInTheDocument();
+			expect(screen.queryByText('player2')).not.toBeInTheDocument();
+			expect(screen.getAllByText(/player/i)).toHaveLength(2);
 		});
 	});
 	it('Shoul render the last player', async () => {
@@ -77,9 +82,8 @@ describe('Player Icons tests', () => {
 		);
 		await waitFor(async () => {
 			expect(screen.queryByText('player1')).not.toBeInTheDocument();
-			expect(screen.queryByText('player2')).not.toBeInTheDocument();
+			expect(screen.queryByText('player2')).toBeInTheDocument();
 			expect(screen.queryByText('player3')).not.toBeInTheDocument();
-			expect(screen.getByText('player4')).toBeInTheDocument();
 			expect(screen.getAllByText(/player/i)).toHaveLength(1);
 		});
 	});

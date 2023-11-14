@@ -1,3 +1,8 @@
+To run the websocket server to mock run:
+```
+node mockServer.js 
+```
+
 # Player
 
 ## sendPlayerName

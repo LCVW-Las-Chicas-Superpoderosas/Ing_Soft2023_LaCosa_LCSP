@@ -1,47 +1,20 @@
-const SERVER_URL = 'http://localhost:8000/game';
+const getGameStatus = (response, idPlayer) => {
+	const json = response;
+	const player = json.data.players.find(
+		(player) => player.id === idPlayer,
+	)?.position;
 
-const getGameStatus = async (idPlayer) => {
-	const parseJSONResponse = (response) => {
-		return new Promise((resolve) => {
-			response.json().then((json) => {
-				console.log('json', json);
-				if (response.ok) {
-					resolve({
-						status: response.status,
-						ok: response.ok,
-						players: json.data.players,
-						position: json.data.my_position,
-						isFinish: json.data.game_status,
-						currentPlayerId: json.data.current_player,
-					});
-				} else {
-					resolve({
-						status: response.status,
-						ok: response.ok,
-						detail: json.detail,
-					});
-				}
-			});
-		});
+	const gameStatus = {
+		status: json.status_code,
+		ok: 1,
+		players: json.data.players,
+		position: player,
+		isFinish: json.data.game_status,
+		currentPlayerId: json.data.current_player,
+		nextPlayerId: json.data.next_player,
 	};
-	const config = {
-		method: 'GET',
-		headers: {
-			'id-player': idPlayer,
-		},
-	};
-	return new Promise((resolve, reject) => {
-		fetch(SERVER_URL, config)
-			.then(parseJSONResponse)
-			.then((response) => {
-				if (response.ok) {
-					return resolve(response);
-				}
-				return reject(response);
-			})
-			.catch((error) => {
-				return reject(error);
-			});
-	});
+
+	return gameStatus;
 };
+
 export default getGameStatus;

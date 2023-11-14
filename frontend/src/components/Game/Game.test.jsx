@@ -85,6 +85,8 @@ describe('Game Layout', () => {
 	afterEach(() => {
 		jest.clearAllMocks();
 		window.sessionStorage.clear();
+		// render clears
+		jest.clearAllTimers();
 	});
 
 	const renderComponent = (state) => {
@@ -100,7 +102,7 @@ describe('Game Layout', () => {
 		);
 	};
 
-	it('Should render the Game With the game and display correct players', () => {
+	it('Should render the Game With the game and display correct players', async () => {
 		renderComponent(gameStarted);
 
 		getGameStatus.mockResolvedValueOnce({
@@ -116,22 +118,22 @@ describe('Game Layout', () => {
 				{name: 'player3', id: 3, position: 2, is_alive: true},
 				{name: 'player4', id: 4, position: 3, is_alive: true},
 				{name: 'player5', id: 5, position: 4, is_alive: true},
-				{name: 'player6', id: 6, position: 5, is_alive: true},
-				{name: 'player7', id: 7, position: 6, is_alive: true},
 			],
 		});
-		waitFor(() => {
+		await waitFor(() => {
 			expect(screen.getByText('DECK')).toBeInTheDocument();
 			expect(screen.getByText('DECK')).toBeInTheDocument();
 			expect(screen.getByText('PLAY')).toBeInTheDocument();
 			expect(screen.getByText('DISCARD')).toBeInTheDocument();
 			expect(screen.getByTestId('hand')).toBeInTheDocument();
 			expect(screen.getByText('Finish Turn')).toBeInTheDocument();
+		});
+		await waitFor(() => {
 			// This players should be in the screen
 			expect(screen.getByText(/player1/i)).toBeInTheDocument();
 			expect(screen.getByText(/player2/i)).toBeInTheDocument();
 			expect(screen.getByText(/player3/i)).toBeInTheDocument();
-			expect(screen.getAllByText(/player/i)).toHaveLength(7);
+			expect(screen.getAllByText(/player/i)).toHaveLength(5);
 			// This should not be in the screen
 			expect(screen.queryByText(/pedro/i)).not.toBeInTheDocument();
 			expect(screen.queryByText(/pepe/i)).not.toBeInTheDocument();
