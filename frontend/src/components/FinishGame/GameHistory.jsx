@@ -28,6 +28,15 @@ export const GameHistory = () => {
 	// revisar la funcionalidad que checkea que todos estan vivos o muertos
 	const allStatusEndGame = players.map((player) => player.is_alive);
 	const invalidResult = checkAllSameStatus(allStatusEndGame);
+	function orderPlayers(players) {
+		// Create a copy of the players array
+		const copyOfPlayers = [...players];
+		const sortedPlayers = copyOfPlayers.sort((a, b) => {
+			return a.id - b.id;
+		});
+		return sortedPlayers;
+	}
+	const OrderPlayers = orderPlayers(players);
 	if (!invalidResult) {
 		return (
 			<Card display='flex'>
@@ -38,7 +47,7 @@ export const GameHistory = () => {
 					Results
 				</Heading>
 				<CardBody>
-					{players?.map((player) => {
+					{OrderPlayers?.map((player) => {
 						return player.is_alive ? (
 							<Box key={player.id}>
 								<Heading textAlign='center' bg='green.200' size='xs'>
