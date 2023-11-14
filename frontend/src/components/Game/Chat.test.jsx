@@ -5,17 +5,32 @@ import userEvent from '@testing-library/user-event';
 import {Chat} from './Chat';
 import {screen, waitFor} from '@testing-library/react';
 
+const playerState2 = {
+	player: {
+		name: 'Juan', // Set the desired initial state values
+		id: 2,
+		loged: true,
+	},
+};
 jest.mock('../../__mocks__/WebSockets');
 describe('Test of Chat', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 	});
 	it('Component should render without crashing', async () => {
+		window.sessionStorage.setItem(
+			'player',
+			JSON.stringify(playerState2.player),
+		);
 		jest.spyOn(global.WebSocket.prototype, 'addEventListener');
 		const connection = new WebSocket('ws://localhost:');
 		renderWithProviders(<Chat connection={connection} />);
 	});
 	it('Component should render and send a message', async () => {
+		window.sessionStorage.setItem(
+			'player',
+			JSON.stringify(playerState2.player),
+		);
 		const connection = new WebSocket('ws://localhost:8000/ws');
 		const user = userEvent.setup();
 		renderWithProviders(<Chat connection={connection} />);
@@ -46,6 +61,10 @@ describe('Test of Chat', () => {
 		});
 	});
 	it('Component should render twice and send and see the messages', async () => {
+		window.sessionStorage.setItem(
+			'player',
+			JSON.stringify(playerState2.player),
+		);
 		const connection = new WebSocket('ws://localhost:8000/ws');
 		const user = userEvent.setup();
 		renderWithProviders(<Chat connection={connection} />);

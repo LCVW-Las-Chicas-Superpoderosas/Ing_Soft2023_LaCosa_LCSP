@@ -5,6 +5,8 @@ const initialState = {
 	position: 0,
 	isFinish: 1,
 	currentPlayer: 0,
+	nextPlayerId: 0,
+	underAttack: false,
 };
 
 const gameSlice = createSlice({
@@ -23,9 +25,22 @@ const gameSlice = createSlice({
 		setCurrentPlayer: (state, action) => {
 			state.currentPlayer = action.payload;
 		},
+		setNextPlayerId: (state, action) => {
+			state.nextPlayerId = action.payload;
+		},
+		setUnderAttack: (state, action) => {
+			state.underAttack = action.payload;
+		},
 	},
 });
 
-export const {setPlayers, setPosition, setIsFinish, setCurrentPlayer} =
-	gameSlice.actions;
+export const {
+	setPlayers,
+	setPosition,
+	setIsFinish,
+	setCurrentPlayer,
+	setFirstDeckCardBack,
+	setNextPlayerId,
+	setUnderAttack,
+} = gameSlice.actions;
 export default gameSlice.reducer;

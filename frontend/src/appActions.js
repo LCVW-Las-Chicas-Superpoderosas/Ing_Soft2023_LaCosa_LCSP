@@ -13,6 +13,7 @@ export const restoreTurnConditions = createAction('hand/restoreTurnConditions');
 // Play Area actions
 export const addToPlayArea = createAction('playArea/addToPlayArea');
 export const cleanPlayArea = createAction('playArea/cleanPlayArea');
+export const saveResponse = createAction('playArea/saveResponse');
 // Discard Pile actions
 export const addToDiscardPile = createAction('discardPile/addToDiscardPile');
 export const cleanDiscardPile = createAction('discardPile/cleanDiscardPile');
@@ -25,3 +26,5 @@ export const setPlayerInGame = createAction('game/setPlayers');
 export const setPositionInGame = createAction('game/setPosition');
 export const setIsFinish = createAction('game/setIsFinish');
 export const setCurrentPlayerInGame = createAction('game/setCurrentPlayer');
+export const setUnderAttack = createAction('game/setUnderAttack');
+export const setNextPlayerId = createAction('game/setNextPlayerId');
