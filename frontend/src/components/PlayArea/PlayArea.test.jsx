@@ -216,7 +216,7 @@ describe('PlayArea component', () => {
 			const spy = jest.spyOn(store, 'dispatch');
 			expect(spy).toHaveBeenCalledTimes(0);
 		});
-	 });
+	});
 });
 
 // returns undefined because the response to this http request is not used
