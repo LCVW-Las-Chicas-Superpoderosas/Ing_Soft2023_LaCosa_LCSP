@@ -33,6 +33,7 @@ describe('Deck component', () => {
 		};
 
 		sessionStorage.setItem('player', JSON.stringify({id: 1}));
+		sessionStorage.setItem('gameId', JSON.stringify({id: 1}));
 		renderWithProviders(<Deck />, {preloadedState: initialState});
 	});
 
@@ -43,10 +44,13 @@ describe('Deck component', () => {
 		const card = within(screen.getByTestId('card-button')).getByTestId(
 			'card-image',
 		);
-		expect(card).toHaveAttribute(
-			'src',
-			'http://localhost:5173/src/assets/cards/reverse.jpg',
-		);
+
+		await waitFor(() => {
+			expect(card).toHaveAttribute(
+				'src',
+				'http://localhost:5173/src/assets/cards/reverse.jpg',
+			);
+		});
 	});
 
 	it('should render picked card', async () => {
@@ -67,15 +71,20 @@ describe('Deck component', () => {
 			},
 			{timeout: 5000},
 		);
-
-		// await waitFor(
-		// 	() => {
-		// 		expect(card).toHaveAttribute(
-		// 			'src',
-		// 			'http://localhost:5173/src/assets/cards/reverse.jpg',
-		// 		);
-		// 	},
-		// 	{timeout: 500},
-		// );
 	});
+});
+
+jest.mock('../request/getDeckTopCard', () => {
+	return {
+		__esModule: true,
+		default: async () => {
+			const response = {
+				status: 200,
+				ok: 'message',
+				topCard: 2,
+			};
+			console.log('response hola', response);
+			return response;
+		},
+	};
 });

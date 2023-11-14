@@ -17,6 +17,9 @@ const Hand = ({isExchange}) => {
 	const dispatch = useDispatch();
 	const response = useSelector((state) => state.playArea.response);
 	const [alert, setAlert] = useState('');
+	const infectionCardUUID = useSelector(
+		(state) => state.hand.infectionCardUUID,
+	);
 
 	// console.log('reading response from state in hand', response);
 
@@ -50,7 +53,7 @@ const Hand = ({isExchange}) => {
 	const handleClick = async (clickedCard) => {
 		if (selectedCard !== clickedCard) {
 			setAlert('');
-			if (isValidCard(clickedCard.token)) {
+			if (isValidCard(clickedCard.token, clickedCard.id, infectionCardUUID)) {
 				// console.log('las condiciones son');
 				// console.log('response', response !== null);
 				// console.log('under attack', underAttack);
