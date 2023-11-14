@@ -62,9 +62,10 @@ describe('Defense', () => {
 			playArea: {
 				response: {
 					under_attack: 1,
-					attack_type: 'Cambio de Lugar',
+					card_being_played: 'Cambio de Lugar',
 					has_defense: 'img.71',
-					attacker: {name: 'pepe', id: 1},
+					attacker_name: 'pepe',
+					attacker_id: 1,
 				},
 			},
 		};
@@ -78,7 +79,8 @@ describe('Defense', () => {
 		});
 
 		await waitFor(() => {
-			expect(screen.getByRole('button')).toBeInTheDocument();
+			// deberia renderearse un boton con el nombre jugar
+			expect(screen.getByText(/Jugar Carta/i)).toBeInTheDocument();
 
 			expect(
 				screen.getByText(
@@ -138,7 +140,7 @@ describe('Defense', () => {
 		await waitFor(() => {
 			expect(connection.send).toHaveBeenCalledTimes(1);
 			expect(connection.send).toHaveBeenCalledWith(
-				'{"idPlayer":2,"type":"defense","playedCard":"img40","targetId":1}',
+				'{"content":{"id_player":2,"type":"defense","card_token":"img40.jpg","do_defense":true}}',
 			);
 		});
 		WS.clean();
