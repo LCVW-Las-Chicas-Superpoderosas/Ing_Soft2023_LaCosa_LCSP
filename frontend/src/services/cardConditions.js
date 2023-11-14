@@ -16,7 +16,7 @@ export const requiresTarget = (cardToken) => {
    ! Van solo listadas las cartas implementadas y las de infección
 */
 const getCardName = (cardToken) => {
-	const cardID = parseInt(String(cardToken).match(/\d\d/));
+	const cardID = parseInt(String(cardToken).match(/\d+/));
 
 	switch (true) {
 		case cardID === 1:

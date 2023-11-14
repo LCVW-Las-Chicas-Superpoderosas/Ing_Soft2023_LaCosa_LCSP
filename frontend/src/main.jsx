@@ -6,8 +6,8 @@ import store from './store/store.js';
 
 import {ChakraProvider, extendTheme} from '@chakra-ui/react';
 
-import {worker} from './mocks/worker.js';
-worker.start();
+// import {worker} from './mocks/worker.js';
+// worker.start();
 
 const theme = extendTheme({
 	styles: {

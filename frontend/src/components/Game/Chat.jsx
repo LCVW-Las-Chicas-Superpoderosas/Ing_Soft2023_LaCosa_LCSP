@@ -7,21 +7,15 @@ import PropTypes from 'prop-types';
 export const Chat = ({connection}) => {
 	const [messages, setMessages] = useState([]);
 	const initialValues = {message: ''};
-
+	const playerId = JSON.parse(sessionStorage.getItem('player')).id;
 	useEffect(() => {
-		const messageHandler = (event) => {
-			if (event.type === 'chat_message') {
-				console.log('Recieved a message: ', event.content);
-				setMessages([...messages, event.content]);
-			}
-		};
 		if (connection) {
 			connection.onmessage = function (event) {
 				const message = JSON.parse(event.data);
 				console.log('In message, recieved a messasge:', message);
-				if (message.type === 'chat_message') {
-					console.log('Recieved a message: ', message.content);
-					messageHandler(message);
+				if (message.data.type === 'chat_message') {
+					console.log('Recieved a message: ', message.data);
+					setMessages([...messages, message.data.message]);
 				}
 			};
 		}
@@ -29,9 +23,13 @@ export const Chat = ({connection}) => {
 	const onSubmit = async (values) => {
 		if (connection) {
 			const chatMessage = {
-				type: 'chat_message',
-				content: values.message,
+				content: {
+					type: 'chat_message',
+					chat_message: values.message,
+					id_player: playerId,
+				},
 			};
+			// console.log('Sending a message: ', JSON.stringify(chatMessage));
 			connection.send(JSON.stringify(chatMessage));
 		}
 		formik.resetForm();

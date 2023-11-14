@@ -47,7 +47,13 @@ const DiscardPile = () => {
 	};
 
 	return (
-		<Box w='100%' h='100%' className='discard-pile' onClick={handleClick}>
+		<Box
+			w='100%'
+			h='100%'
+			className='discard-pile'
+			onClick={handleClick}
+			data-testid={'discard-pile'}
+		>
 			{discardedCard && (
 				<Card
 					className={`card ${highlight ? 'highlighted' : ''}`}

@@ -55,6 +55,7 @@ export const Game = () => {
 	const displayDefense = useSelector((state) => state.game.underAttack);
 	const [conHandPlay, setconHandPlay] = useState(null);
 	const [target, setTarget] = useState(null);
+	const [socketChat, setSocketChat] = useState(null);
 
 	useEffect(() => {
 		const connection = new WebSocket('ws://localhost:8000/ws/game_status'); // testearlo al ws o http.
@@ -74,7 +75,6 @@ export const Game = () => {
 			dispatch(setIsFinish(gameStatus.isFinish));
 			dispatch(setCurrentPlayerInGame(gameStatus.currentPlayerId));
 		}
-
 		connection.onmessage = function (response) {
 			// console.log('on message: ', response);
 			const resp = JSON.parse(response.data);
@@ -174,6 +174,14 @@ export const Game = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [idPlayer, dispatch, displayDefense, setconHandPlay]);
 
+	// Chat
+	useEffect(() => {
+		const connection = new WebSocket(
+			`ws://localhost:8000/ws/chat?id_player=${idPlayer}`,
+		);
+		setSocketChat(connection);
+	}, [idPlayer]);
+
 	async function finishTurn() {
 		try {
 			const response = await endTurn(idGame);
@@ -253,7 +261,7 @@ export const Game = () => {
 					</GridItem>
 					<GridItem bg='white' rowSpan={1} colSpan={1} />
 					<GridItem bg='yellow' rowSpan={7} colSpan={2}>
-						<Chat />
+						<Chat connection={socketChat} />
 					</GridItem>
 					<GridItem bg='white' rowSpan={3} colSpan={1} paddingLeft='160px'>
 						<Positions relativePositionToTable={3} />
