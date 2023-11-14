@@ -1,6 +1,6 @@
 import getLobbyStatus from '../request/getLobbyStatus';
 import {useDispatch, useSelector} from 'react-redux';
-import {setCanStart, setLobby, setFirstDeckCardBack} from '../../appActions';
+import {setCanStart, setLobby} from '../../appActions';
 import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import startGame from '../request/startGame';
@@ -25,9 +25,7 @@ const Lobby = () => {
 
 	const StartGame = async () => {
 		try {
-			const resp = await startGame({idPlayer: userId});
-			// to be able to render first card back in deck
-			dispatch(setFirstDeckCardBack(resp.firstDeckCardBack));
+			await startGame({idPlayer: userId});
 			navigate(`/Games/${gameId}/play`);
 		} catch (error) {
 			setAlert2(error.detail);

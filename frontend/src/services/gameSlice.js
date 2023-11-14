@@ -5,7 +5,6 @@ const initialState = {
 	position: 0,
 	isFinish: 1,
 	currentPlayer: 0,
-	firstDeckCardBack: -1,
 	nextPlayerId: 0,
 	underAttack: false,
 };
@@ -25,9 +24,6 @@ const gameSlice = createSlice({
 		},
 		setCurrentPlayer: (state, action) => {
 			state.currentPlayer = action.payload;
-		},
-		setFirstDeckCardBack: (state, action) => {
-			state.firstDeckCardBack = action.payload;
 		},
 		setNextPlayerId: (state, action) => {
 			state.nextPlayerId = action.payload;
