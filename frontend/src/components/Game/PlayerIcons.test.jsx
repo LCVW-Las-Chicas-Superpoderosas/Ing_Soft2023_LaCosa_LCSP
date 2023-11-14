@@ -105,6 +105,14 @@ describe('Player Icons tests', () => {
 		window.sessionStorage.setItem('player', JSON.stringify(player));
 		window.sessionStorage.setItem('gameId', 1);
 
+		const initialState = {
+			...customInitialState,
+			hand: {
+				...customInitialState.hand,
+				alreadyPicked: true,
+			},
+		};
+
 		// eslint-disable-next-line no-unused-vars
 		const {store, _rtl} = renderWithProviders(
 			<ChakraProvider>
@@ -115,7 +123,7 @@ describe('Player Icons tests', () => {
 				/>
 			</ChakraProvider>,
 			{
-				preloadedState: customInitialState,
+				preloadedState: initialState,
 			},
 		);
 
@@ -141,6 +149,14 @@ describe('Player Icons tests', () => {
 		window.sessionStorage.setItem('player', JSON.stringify(player));
 		window.sessionStorage.setItem('gameId', 1);
 
+		const initialState = {
+			...customInitialState,
+			hand: {
+				...customInitialState.hand,
+				alreadyPicked: true,
+			},
+		};
+
 		// eslint-disable-next-line no-unused-vars
 		const {store, _rtl} = renderWithProviders(
 			<ChakraProvider>
@@ -151,7 +167,7 @@ describe('Player Icons tests', () => {
 				/>
 			</ChakraProvider>,
 			{
-				preloadedState: customInitialState,
+				preloadedState: initialState,
 			},
 		);
 

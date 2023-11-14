@@ -43,7 +43,7 @@ export const PlayerIcons = ({
 		const handleClick = (player) => {
 			console.log('player clicked', player);
 			console.log('selected card is', selectedCard);
-			if (selectedCard && canPlayOnTarget()) {
+			if (canPlayOnTarget(player)) {
 				// add bounderie for valid target
 				console.log('selecting ', player.id, 'as target');
 				dispatch(addToPlayArea({card: selectedCard, target: player.id}));
