@@ -12,6 +12,7 @@ import {
 	GridItem,
 	Flex,
 	Button,
+	useDisclosure,
 	Modal,
 	ModalOverlay,
 	ModalContent,
@@ -19,7 +20,6 @@ import {
 	ModalFooter,
 	ModalBody,
 	ModalCloseButton,
-	useDisclosure,
 } from '@chakra-ui/react';
 import {useDispatch, useSelector} from 'react-redux';
 import getGameStatus from '../request/getGameStatus';
@@ -33,6 +33,7 @@ import {
 	saveResponse,
 	setUnderAttack,
 	setHand,
+	setNextPlayerId,
 } from '../../appActions';
 import {endTurn} from '../request/endTurn';
 import {FinishGame} from '../../containers/FinishGame';
@@ -41,6 +42,7 @@ import {v4 as uuidv4} from 'uuid';
 import getCard from '../request/getCard';
 import {appendToHand} from '../../services/handSlice';
 
+import EndTurnExchange from './EndTurnExchange';
 export const Game = () => {
 	const idPlayer = JSON.parse(sessionStorage.getItem('player')).id;
 	const currentPlayer = useSelector((state) => state.game.currentPlayer);
@@ -55,6 +57,12 @@ export const Game = () => {
 	const displayDefense = useSelector((state) => state.game.underAttack);
 	const [conHandPlay, setconHandPlay] = useState(null);
 	const [target, setTarget] = useState(null);
+	const {
+		isOpen: isOpenExchange,
+		onOpen: onOpenExchange,
+		onClose: onCloseExchange,
+	} = useDisclosure();
+	const [etapa, setEtapa] = useState(0);
 	const [socketChat, setSocketChat] = useState(null);
 
 	useEffect(() => {
@@ -62,8 +70,6 @@ export const Game = () => {
 
 		connection.onopen = () => {
 			const idToSend = {type: 'game_status', content: {id_player: idPlayer}};
-			// console.log('sending ', JSON.stringify(idToSend));
-			// console.log('on the web socket');
 			connection.send(JSON.stringify(idToSend)); // event: game_status.
 		};
 
@@ -74,11 +80,13 @@ export const Game = () => {
 			dispatch(setPositionInGame(gameStatus.position));
 			dispatch(setIsFinish(gameStatus.isFinish));
 			dispatch(setCurrentPlayerInGame(gameStatus.currentPlayerId));
+			dispatch(setNextPlayerId(gameStatus.nextPlayerId));
 		}
+
 		connection.onmessage = function (response) {
 			// console.log('on message: ', response);
 			const resp = JSON.parse(response.data);
-			console.log(resp);
+			console.log('game status:', resp);
 			const gameStatus = getGameStatus(resp, idPlayer);
 			getDataOfGame(gameStatus);
 		};
@@ -217,7 +225,6 @@ export const Game = () => {
 		return (
 			<Center h='100%' w='100%'>
 				<>
-					{/*		Modal que se encarga de la defensa */}
 					<Modal isOpen={isOpenDefense} onCloseDefense={onCloseDefense}>
 						<ModalOverlay
 							bg='none'
@@ -243,6 +250,13 @@ export const Game = () => {
 						</ModalContent>
 					</Modal>
 				</>
+				<EndTurnExchange
+					onOpen={onOpenExchange}
+					isOpen={isOpenExchange}
+					onClose={onCloseExchange}
+					etapa={etapa}
+					setEtapa={setEtapa}
+				/>
 				<Grid
 					h='90vh'
 					w='90vw'
@@ -255,15 +269,15 @@ export const Game = () => {
 					<GridItem textAlign='center' bg='yellow' rowSpan={7} colSpan={2}>
 						<Text>logs</Text>
 					</GridItem>
-					<GridItem bg='white' rowSpan={1} colSpan={1} />
-					<GridItem bg='white' rowSpan={1} colSpan={3} paddingTop='40px'>
+					<GridItem rowSpan={1} colSpan={1} />
+					<GridItem rowSpan={1} colSpan={3} paddingTop='40px'>
 						<Positions relativePositionToTable={2} />
 					</GridItem>
-					<GridItem bg='white' rowSpan={1} colSpan={1} />
-					<GridItem bg='yellow' rowSpan={7} colSpan={2}>
+					<GridItem rowSpan={1} colSpan={1} />
+					<GridItem rowSpan={7} colSpan={2}>
 						<Chat connection={socketChat} />
 					</GridItem>
-					<GridItem bg='white' rowSpan={3} colSpan={1} paddingLeft='160px'>
+					<GridItem rowSpan={3} colSpan={1} paddingLeft='160px'>
 						<Positions relativePositionToTable={3} />
 					</GridItem>
 					<GridItem
@@ -295,37 +309,52 @@ export const Game = () => {
 							</Box>
 						</Flex>
 					</GridItem>
-					<GridItem bg='white' rowSpan={3} colSpan={1} paddingRight='160px'>
+					<GridItem rowSpan={3} colSpan={1} paddingRight='160px'>
 						<Positions relativePositionToTable={1} />
 					</GridItem>
-					<GridItem rowSpan={1} colSpan={1} bg='white' />
-					<GridItem bg='white' rowSpan={1} colSpan={3} paddingBottom='60px'>
+					<GridItem rowSpan={1} colSpan={1} />
+					<GridItem rowSpan={1} colSpan={3} paddingBottom='60px'>
 						<Positions relativePositionToTable={0} />
 					</GridItem>
 					<GridItem
-						bg='white'
 						display='flex'
 						justifyContent='center'
 						alignItems='center'
 						rowSpan={1}
 						colSpan={1}
 					>
-						<Button
-							variant='solid'
-							bg={idPlayer === currentPlayer ? 'teal' : 'gray'}
-							aria-label='Call Sage'
-							fontSize='20px'
-							onClick={() => {
-								if (idPlayer === currentPlayer) {
-									finishTurn();
-								}
-							}}
-							disabled={idPlayer !== currentPlayer}
-						>
-							Finish Turn
-						</Button>
+						<Flex direction='column'>
+							<Button
+								m='10px'
+								variant='solid'
+								bg={idPlayer === currentPlayer ? 'teal' : 'gray'}
+								aria-label='Call Sage'
+								fontSize='20px'
+								onClick={() => {
+									if (idPlayer === currentPlayer) {
+										finishTurn();
+									}
+								}}
+								disabled={idPlayer !== currentPlayer}
+							>
+								Finish Turn
+							</Button>
+							<Button
+								variant='solid'
+								bg={idPlayer === currentPlayer ? 'teal' : 'gray'}
+								aria-label='Call Sage'
+								fontSize='20px'
+								onClick={() => {
+									setEtapa(1);
+									onOpenExchange();
+								}}
+								disabled={idPlayer !== currentPlayer}
+							>
+								Exchange card
+							</Button>
+						</Flex>
 					</GridItem>
-					<GridItem bg='white' rowSpan={2} colSpan={5}>
+					<GridItem rowSpan={2} colSpan={5}>
 						<Flex justify='center' direction='row'>
 							<Box maxW='60%'>
 								<Hand />
@@ -337,4 +366,5 @@ export const Game = () => {
 		);
 	}
 };
+
 export default Game;

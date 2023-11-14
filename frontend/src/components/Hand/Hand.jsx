@@ -5,10 +5,12 @@ import {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {setHand, selectCard, cleanSelectedCard} from '../../appActions';
 import isValidCard from '../../services/cardConditions.js';
+import PropTypes from 'prop-types';
 // eslint-disable-next-line no-unused-vars
 import {response} from 'msw';
 // represents a player's hand
-const Hand = () => {
+
+const Hand = ({isExchange}) => {
 	const userId = JSON.parse(sessionStorage.getItem('player')).id;
 	const cards = useSelector((state) => state.hand.cards);
 	const selectedCard = useSelector((state) => state.hand.selectedCard);
@@ -34,7 +36,9 @@ const Hand = () => {
 			dispatch(setHand(res.cards));
 			// console.log('fetchHand', res.cards);
 		};
-		fetchHand();
+		if (!isExchange) {
+			fetchHand();
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -103,6 +107,14 @@ const Hand = () => {
 			</Text>
 		</>
 	);
+};
+
+Hand.propTypes = {
+	isExchange: PropTypes.bool,
+};
+
+Hand.defaultProps = {
+	isExchange: false,
 };
 
 export default Hand;
