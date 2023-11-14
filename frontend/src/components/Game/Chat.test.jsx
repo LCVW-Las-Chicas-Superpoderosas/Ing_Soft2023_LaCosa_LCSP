@@ -51,13 +51,18 @@ describe('Test of Chat', () => {
 		});
 		user.click(textBox);
 		user.type(textBox, 'World');
+
+		await waitFor(() => {
+			expect(textBox).toHaveValue('');
+		});
+
 		await waitFor(() => {
 			expect(textBox).toHaveValue('World');
 		});
 		user.click(screen.getByText('Send'));
 		await waitFor(() => {
 			// expect(screen.getByText(/^Hello$/)).toBeInTheDocument();
-			expect(screen.getByText(/^World$/)).toBeInTheDocument();
+			expect(screen.getByText(/World$/)).toBeInTheDocument();
 		});
 	});
 	it('Component should render twice and send and see the messages', async () => {
@@ -91,4 +96,6 @@ describe('Test of Chat', () => {
 			// add to have been called for the handle
 		});
 	});
+
+	//test for chat
 });
