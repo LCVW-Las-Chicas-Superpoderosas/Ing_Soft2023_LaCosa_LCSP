@@ -8,10 +8,13 @@ import isValidCard from '../../services/cardConditions.js';
 
 // represents a player's hand
 const Hand = () => {
+	const dispatch = useDispatch();
 	const userId = JSON.parse(sessionStorage.getItem('player')).id;
 	const cards = useSelector((state) => state.hand.cards);
 	const selectedCard = useSelector((state) => state.hand.selectedCard);
-	const dispatch = useDispatch();
+	const infectionCardUUID = useSelector(
+		(state) => state.hand.infectionCardUUID,
+	);
 
 	// when component mounts
 	useEffect(() => {
@@ -29,7 +32,7 @@ const Hand = () => {
 	*/
 	const handleClick = async (clickedCard) => {
 		if (selectedCard !== clickedCard) {
-			if (isValidCard(clickedCard.token)) {
+			if (isValidCard(clickedCard.token, clickedCard.id, infectionCardUUID)) {
 				dispatch(selectCard(clickedCard));
 			}
 		} else {

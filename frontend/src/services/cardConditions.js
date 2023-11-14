@@ -1,7 +1,11 @@
 /* returns true if card can be played */
-const isValidCard = (cardToken) => {
+const isValidCard = (cardToken, cardUUID, causedInfectionUUID) => {
 	const cardName = getCardName(cardToken);
-	return cardName !== 'infectado' && cardName !== 'la cosa';
+
+	return (
+		!(cardName === 'infectado' && cardUUID === causedInfectionUUID) &&
+		cardName !== 'la cosa'
+	);
 };
 
 export default isValidCard;
@@ -30,6 +34,11 @@ export const isDefense = (cardToken) => {
 		cardName === 'fallaste' ||
 		cardName === 'nada de barbacoas'
 	);
+};
+
+export const isInfection = (cardToken) => {
+	const cardName = getCardName(cardToken);
+	return cardName === 'infectado';
 };
 
 export const isObstacle = (cardToken) => {
