@@ -1,5 +1,7 @@
 import {
 	Button,
+	HStack,
+	Box,
 	Modal,
 	ModalBody,
 	ModalContent,
@@ -16,7 +18,7 @@ import Card from '../Card/Card.jsx';
 
 const initialMiliSeconds = 5000;
 
-const CardModal = ({revealedcard}) => {
+const CardModal = ({revealedCards}) => {
 	const [remainingMiliSeconds, setRemainingMiliSeconds] =
 		useState(initialMiliSeconds);
 	const cardModalIsOpen = useSelector((state) => state.game.cardModalIsOpen);
@@ -54,7 +56,11 @@ const CardModal = ({revealedcard}) => {
 
 	return (
 		<>
-			<Modal isOpen={cardModalIsOpen} size={'sm'} onClose={closeModal}>
+			<Modal
+				isOpen={cardModalIsOpen}
+				size={`${revealedCards.length === 1 ? 'xs' : '4xl'}`}
+				onClose={closeModal}
+			>
 				<ModalOverlay
 					bg='none'
 					backdropFilter='auto'
@@ -63,10 +69,23 @@ const CardModal = ({revealedcard}) => {
 					data-testid={'card-modal'}
 				/>
 				<ModalContent>
-					<ModalHeader>Carta revelada</ModalHeader>
+					<ModalHeader>Cartas reveladas</ModalHeader>
 
 					<ModalBody>
-						{revealedcard && <Card info={revealedcard} front={true} />}
+						{revealedCards && (
+							<HStack
+								data-testid='revealed-cards'
+								justify='center'
+								maxH='full'
+								minH='full'
+							>
+								{revealedCards?.map((card) => (
+									<Box key={card.id} data-testid='revealed-card'>
+										<Card key={card.id} info={card} front={true} />
+									</Box>
+								))}
+							</HStack>
+						)}
 					</ModalBody>
 
 					<ModalFooter>
@@ -84,11 +103,13 @@ const CardModal = ({revealedcard}) => {
 };
 
 CardModal.propTypes = {
-	revealedcard: PropTypes.shape({
-		id: PropTypes.string,
-		token: PropTypes.string,
-		type: PropTypes.number,
-	}),
+	revealedCards: PropTypes.arrayOf(
+		PropTypes.shape({
+			id: PropTypes.string,
+			token: PropTypes.string,
+			type: PropTypes.number,
+		}),
+	),
 };
 
 export default CardModal;

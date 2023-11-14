@@ -20,7 +20,7 @@ describe('CardModal component', () => {
 		};
 
 		renderWithProviders(
-			<CardModal revealedcard={{id: '0', token: 'img22.jpg', type: 1}} />,
+			<CardModal revealedCards={[{id: '0', token: 'img22.jpg', type: 1}]} />,
 			{
 				preloadedState: initialState,
 			},
@@ -46,7 +46,7 @@ describe('CardModal component', () => {
 
 		// eslint-disable-next-line no-unused-vars
 		const {store, _rtl} = renderWithProviders(
-			<CardModal revealedcard={{id: '0', token: 'img22.jpg', type: 1}} />,
+			<CardModal revealedCards={[{id: '0', token: 'img22.jpg', type: 1}]} />,
 			{
 				preloadedState: initialState,
 			},
@@ -72,7 +72,7 @@ describe('CardModal component', () => {
 
 		// eslint-disable-next-line no-unused-vars
 		const {store, _rtl} = renderWithProviders(
-			<CardModal revealedcard={{id: '0', token: 'img22.jpg', type: 1}} />,
+			<CardModal revealedCards={[{id: '0', token: 'img22.jpg', type: 1}]} />,
 			{
 				preloadedState: initialState,
 			},
