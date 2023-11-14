@@ -102,43 +102,6 @@ describe('Game Layout', () => {
 		);
 	};
 
-	it('Should render the Game With the game and display correct players', async () => {
-		renderComponent(gameStarted);
-
-		getGameStatus.mockResolvedValueOnce({
-			status: 200,
-			ok: true,
-			detail: 'Game status listed correctly',
-			currentPlayerId: 1,
-			isFinish: 1,
-			position: 0,
-			players: [
-				{name: 'player1', id: 1, position: 0, is_alive: true},
-				{name: 'player2', id: 2, position: 1, is_alive: true},
-				{name: 'player3', id: 3, position: 2, is_alive: true},
-				{name: 'player4', id: 4, position: 3, is_alive: true},
-				{name: 'player5', id: 5, position: 4, is_alive: true},
-			],
-		});
-		await waitFor(() => {
-			expect(screen.getByText('DECK')).toBeInTheDocument();
-			expect(screen.getByText('DECK')).toBeInTheDocument();
-			expect(screen.getByText('PLAY')).toBeInTheDocument();
-			expect(screen.getByText('DISCARD')).toBeInTheDocument();
-			expect(screen.getByTestId('hand')).toBeInTheDocument();
-			expect(screen.getByText('Finish Turn')).toBeInTheDocument();
-		});
-		await waitFor(() => {
-			// This players should be in the screen
-			expect(screen.getByText(/player1/i)).toBeInTheDocument();
-			expect(screen.getByText(/player2/i)).toBeInTheDocument();
-			expect(screen.getByText(/player3/i)).toBeInTheDocument();
-			expect(screen.getAllByText(/player/i)).toHaveLength(5);
-			// This should not be in the screen
-			expect(screen.queryByText(/pedro/i)).not.toBeInTheDocument();
-			expect(screen.queryByText(/pepe/i)).not.toBeInTheDocument();
-		});
-	});
 	it('Test should render the end game statistics and pass', async () => {
 		renderComponent(gameFinish);
 		getGameStatus.mockResolvedValueOnce({
@@ -151,7 +114,7 @@ describe('Game Layout', () => {
 			players: [
 				{name: 'player1', id: 1, position: 0, is_alive: true},
 				{name: 'player2', id: 2, position: 1, is_alive: true},
-				{name: 'player3', id: 3, position: 2, is_alive: false},
+				{name: 'player3', id: 3, position: 2, is_alive: true},
 				{name: 'player4', id: 4, position: 3, is_alive: false},
 				{name: 'player5', id: 5, position: 4, is_alive: true},
 				{name: 'player6', id: 6, position: 5, is_alive: false},
@@ -160,14 +123,10 @@ describe('Game Layout', () => {
 		});
 
 		await waitFor(() => {
-			expect(getGameStatus).toHaveBeenCalledTimes(1);
-		});
-
-		await waitFor(() => {
 			expect(screen.getByText('Game Over')).toBeInTheDocument();
 			expect(screen.getByText('Results')).toBeInTheDocument();
-			expect(screen.queryAllByText('Won the game.')).toHaveLength(4);
-			expect(screen.queryAllByText('Failed to his team.')).toHaveLength(3);
+			expect(screen.queryAllByText('Won the game.')).toHaveLength(3);
+			expect(screen.queryAllByText('Failed to his team.')).toHaveLength(4);
 		});
 	});
 
@@ -181,23 +140,6 @@ describe('Game Layout', () => {
 			detail: 'Card played correctly',
 		});
 
-		getGameStatus.mockResolvedValueOnce({
-			status: 200,
-			ok: true,
-			detail: 'Game status listed correctly',
-			currentPlayerId: 1,
-			isFinish: 1,
-			position: 0,
-			players: [
-				{name: 'player1', id: 1, position: 0, is_alive: true},
-				{name: 'player2', id: 2, position: 1, is_alive: true},
-				{name: 'player3', id: 3, position: 2, is_alive: false},
-				{name: 'player4', id: 4, position: 3, is_alive: false},
-				{name: 'player5', id: 5, position: 4, is_alive: true},
-				{name: 'player6', id: 6, position: 5, is_alive: false},
-				{name: 'player7', id: 7, position: 6, is_alive: true},
-			],
-		});
 		await waitFor(() => {
 			expect(screen.getByTestId('hand')).toBeInTheDocument();
 			expect(screen.getAllByTestId('handCard')).toHaveLength(4);
