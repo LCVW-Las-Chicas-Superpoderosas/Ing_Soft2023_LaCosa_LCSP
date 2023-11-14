@@ -6,6 +6,7 @@ export const appendToHand = createAction('hand/appendToHand');
 export const removeFromHand = createAction('hand/removeFromHand');
 export const selectCard = createAction('hand/selectCard');
 export const cleanSelectedCard = createAction('hand/cleanSelectedCard');
+export const setInfectionCardUUID = createAction('hand/setInfectionCardUUID');
 // Turn actions
 export const setAlreadyPlayed = createAction('hand/setAlreadyPlayed');
 export const setAlreadyPicked = createAction('hand/setAlreadyPicked');

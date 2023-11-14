@@ -4,6 +4,7 @@ import {createSlice} from '@reduxjs/toolkit';
 const initialState = {
 	cards: [],
 	selectedCard: '',
+	infectionCardUUID: null,
 	alreadyPlayed: false,
 	alreadyPicked: false,
 };
@@ -31,6 +32,9 @@ const handSlice = createSlice({
 		cleanSelectedCard: (state) => {
 			state.selectedCard = '';
 		},
+		setInfectionCardUUID: (state, action) => {
+			state.infectionCardUUID = action.payload;
+		},
 		setAlreadyPlayed: (state) => {
 			state.alreadyPlayed = true;
 		},
@@ -51,6 +55,7 @@ export const {
 	removeFromHand,
 	selectCard,
 	cleanSelectedCard,
+	setInfectionCardUUID,
 	setAlreadyPlayed,
 	setAlreadyPicked,
 	restoreTurnConditions,
