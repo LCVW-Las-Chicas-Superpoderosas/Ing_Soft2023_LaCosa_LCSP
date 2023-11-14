@@ -96,4 +96,6 @@ describe('Test of Chat', () => {
 			// add to have been called for the handle
 		});
 	});
+
+	//test for chat
 });
