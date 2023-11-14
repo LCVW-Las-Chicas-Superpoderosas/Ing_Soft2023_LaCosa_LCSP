@@ -2,7 +2,6 @@ import {createSlice} from '@reduxjs/toolkit';
 
 const initialState = {
 	card: null, // objeto de la forma {card, target}
-	response: null, // JSON que guarda la respuesta del back parseada
 };
 
 const playAreaSlice = createSlice({
@@ -15,12 +14,8 @@ const playAreaSlice = createSlice({
 		cleanPlayArea: (state) => {
 			state.card = null;
 		},
-		saveResponse: (state, action) => {
-			state.response = action.payload;
-		},
 	},
 });
 
-export const {addToPlayArea, cleanPlayArea, saveResponse} =
-	playAreaSlice.actions;
+export const {addToPlayArea, cleanPlayArea} = playAreaSlice.actions;
 export default playAreaSlice.reducer;
